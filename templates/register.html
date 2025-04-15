@@ -34,7 +34,7 @@
                         {% endif %}
                     </div>
 
-                    <form method="POST" action="{{ url_for('main') }}">
+                    <form method="POST" action="{{ url_for('chat_page') }}">
                         {{ form.hidden_tag() }}
                         <div class="mb-3">
                             {{ form.email.label(class="form-label") }}

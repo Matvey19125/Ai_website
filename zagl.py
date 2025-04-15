@@ -1,11 +1,10 @@
-from flask import Flask, render_template, redirect, url_for, request
+from flask import Flask, render_template, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
-from flask_login import LoginManager, UserMixin, login_user, current_user, login_required
+from flask_login import LoginManager, UserMixin, login_user
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField
 from wtforms.validators import DataRequired, Email
 from werkzeug.security import generate_password_hash, check_password_hash
-import g4f
 
 app = Flask(__name__)
 
@@ -69,28 +68,34 @@ def login():
         user = User.query.filter_by(email=form.email.data).first()
         if user and user.check_password(form.password.data):
             login_user(user)
-            return redirect(url_for('chat_page'))
+            return redirect(url_for('main'))
         else:
             pass
     return render_template("login.html", form=form)
 
-@app.route("/chat", methods=['GET', 'POST'])
-@login_required
-def chat_page():
-    if request.method == 'POST':
-        user_input = request.form.get('user_input')
-        if user_input:
-            try:
-                response = g4f.ChatCompletion.create(
-                    model="gpt-4",
-                    messages=[{"role": "user", "content": user_input}]
-                )
-                return render_template('chat.html', response=response, user_input=user_input)
-            except Exception as e:
-                return render_template('chat.html', error=str(e))
-    return render_template('chat.html')
+@app.route("/main")
+def main():
+    return "Вошел"
 
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
     app.run(port=8080, host='127.0.0.1')
+
+
+    @app.route("/chat", methods=['GET', 'POST'])
+    @login_required
+    def chat_page():
+        if request.method == 'POST':
+            user_input = request.form.get('user_input')
+            if user_input:
+                try:
+                    response = g4f.ChatCompletion.create(
+                        model="gpt-4",
+                        messages=[{"role": "user", "content": user_input}]
+                    )
+                    return render_template('chat.html', response=response, user_input=user_input)
+                except Exception as e:
+                    return render_template('chat.html', error=str(e))
+
+        return render_template('chat.html')
