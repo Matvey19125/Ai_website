@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Интерактивный Python</title>
+    <style>
+        body {
+            font-family: 'Consolas', 'Monaco', monospace;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        textarea {
+            width: 100%;
+            height: 200px;
+            font-family: monospace;
+            font-size: 14px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            background-color: #f8f8f8;
+        }
+        .console {
+            width: 100%;
+            height: 300px;
+            overflow-y: auto;
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            margin-bottom: 10px;
+        }
+        .console-input {
+            width: 100%;
+            padding: 10px;
+            font-family: monospace;
+            font-size: 14px;
+            border: 1px solid #4CAF50;
+            border-radius: 4px;
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-top: 10px;
+            margin-right: 10px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .clear-btn {
+            background-color: #f44336;
+        }
+        .clear-btn:hover {
+            background-color: #d32f2f;
+        }
+        h1 {
+            color: #333;
+        }
+        .prompt {
+            color: #4CAF50;
+            font-weight: bold;
+        }
+        .input-prompt {
+            color: #569CD6;
+            font-weight: bold;
+        }
+        .output {
+            color: #d4d4d4;
+        }
+        .error {
+            color: #f44747;
+        }
+        .input-area {
+            background-color: #252526;
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Интерактивный Python</h1>
+
+    <form method="POST" action="/python">
+        <textarea name="code" placeholder="Введите ваш Python код здесь">{{ current_code }}</textarea>
+        <br>
+        <button type="submit">Выполнить</button>
+        <button type="submit" name="clear" value="true" class="clear-btn">Очистить</button>
+    </form>
+
+    <div class="console">
+        {% for line in console_history %}
+            {% if line.startswith('>>> ') %}
+                <div><span class="prompt">>>></span> <span class="output">{{ line[4:] }}</span></div>
+            {% elif line.startswith('Введите данные:') %}
+                <div class="input-prompt">{{ line }}</div>
+            {% elif 'Ошибка:' in line %}
+                <div class="error">{{ line }}</div>
+            {% else %}
+                <div class="output">{{ line }}</div>
+            {% endif %}
+        {% endfor %}
+    </div>
+
+    {% if waiting_for_input %}
+    <div class="input-area">
+        <form method="POST" action="/python">
+            <input type="hidden" name="code" value="{{ current_code }}">
+            <div class="input-prompt">{{ input_prompt }}</div>
+            <input class="console-input" type="text" name="console_input"
+                   autocomplete="off" autofocus>
+            <button type="submit">Отправить</button>
+        </form>
+    </div>
+    {% else %}
+    <div class="input-area">
+        <form method="POST" action="/python">
+            <input type="hidden" name="code" value="{{ current_code }}">
+            <div class="prompt">>>></div>
+            <input class="console-input" type="text" name="console_input"
+                   placeholder="Введите команду Python" autocomplete="off" autofocus>
+            <button type="submit">Выполнить</button>
+        </form>
+    </div>
+    {% endif %}
+
+</body>
+</html>
