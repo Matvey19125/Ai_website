@@ -98,4 +98,4 @@ if __name__ == '__main__':
                 except Exception as e:
                     return render_template('chat.html', error=str(e))
 
-        return render_template('chat.html')
+        return render_template('chat.html')a

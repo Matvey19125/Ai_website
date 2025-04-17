@@ -9,6 +9,7 @@ import g4f
 import subprocess
 import sys
 import os
+from deep_translator import GoogleTranslator
 
 app = Flask(__name__)
 
@@ -103,30 +104,66 @@ def run_code():
         output = ""
         error = ""
         try:
+            inputs = user_input.strip().splitlines()
             with open('temp_code.py', 'w', encoding='utf-8') as f:
                 f.write(code)
-
+            with open('temp_input.txt', 'w', encoding='utf-8') as f:
+                f.write("\n".join(inputs))
             process = subprocess.Popen(
                 ['python', 'temp_code.py'],
-                stdin=subprocess.PIPE,
+                stdin=open('temp_input.txt', 'r'),
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
                 text=True
             )
-
-            stdout, stderr = process.communicate(input=user_input)
+            stdout, stderr = process.communicate()
             os.remove('temp_code.py')
-
+            os.remove('temp_input.txt')
             output = stdout
             error = stderr
+
         except Exception as e:
             error = str(e)
+            if os.path.exists('temp_code.py'):
+                os.remove('temp_code.py')
+            if os.path.exists('temp_input.txt'):
+                os.remove('temp_input.txt')
         return render_template('comp.html',
                                code=code,
                                user_input=user_input,
                                output=output,
                                error=error)
-    return render_template('comp.html')
+
+    return render_template('comp.html',
+                         code='''# Пример кода
+a = int(input("Введите первое число: "))
+b = int(input("Введите второе число: "))
+print(f"Сумма: {a + b}")''',
+                         user_input='10\n20')
+
+
+@app.route('/translate', methods=['GET', 'POST'])
+def translate_text():
+    if request.method == 'POST':
+        text_to_translate = request.form['text']
+        target_language = request.form.get('target_lang')
+        if not text_to_translate.strip():
+            translated_text = ''
+        else:
+            try:
+                translated_text = GoogleTranslator(source='auto', target=target_language).translate(text_to_translate)
+            except Exception as e:
+                print(f'Ошибка перевода: {e}')
+                translated_text = f'Перевод невозможен: ошибка'
+    else:
+        translated_text = None
+
+    return render_template('translator.html', translation_result=translated_text)
+
+
+@app.route('/menu', methods=['GET', 'POST'])
+def menu():
+    return render_template("")
 
 if __name__ == '__main__':
     with app.app_context():
