@@ -2,6 +2,7 @@ from flask import Flask, render_template, redirect, url_for, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, current_user, login_required
 from flask_wtf import FlaskForm
+from wtforms.validators import DataRequired, Email, Length
 from wtforms import StringField, PasswordField, SubmitField
 from wtforms.validators import DataRequired, Email
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -19,7 +20,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
 login_manager = LoginManager(app)
-login_manager.login_view = 'login'
+login_manager.login_view = 'output'
 
 
 class User(db.Model, UserMixin):
@@ -34,11 +35,16 @@ class User(db.Model, UserMixin):
         return check_password_hash(self.password, password)
 
 
-class LoginForm(FlaskForm):
-    email = StringField('Email', validators=[DataRequired()])
-    password = PasswordField('Пароль', validators=[DataRequired()])
+class RegistrationForm(FlaskForm):
+    email = StringField('Email', validators=[
+        DataRequired(message='Это поле обязательно'),
+        Email(message='Некорректный адрес электронной почты')
+    ])
+    password = PasswordField('Пароль', validators=[
+        DataRequired(message='Это поле обязательно'),
+        Length(min=8, message='Пароль должен содержать минимум 8 символов')
+    ])
     submit = SubmitField('Зарегистрироваться')
-
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -47,7 +53,7 @@ def load_user(user_id):
 
 @app.route('/', methods=['GET', 'POST'])
 def main_reg():
-    form = LoginForm()
+    form = RegistrationForm()
     if form.validate_on_submit():
         existing_user = User.query.filter_by(email=form.email.data).first()
         if existing_user:
@@ -56,24 +62,22 @@ def main_reg():
                                    message="Пользователь с таким email уже существует")
 
         new_user = User(email=form.email.data)
-
         new_user.set_password(form.password.data)
         db.session.add(new_user)
         db.session.commit()
         login_user(new_user)
-        return redirect(url_for('output'))
-
+        return redirect(url_for('menu'))
     return render_template('register.html', form=form)
 
 
 @app.route("/output", methods=['GET', 'POST'])
-def login():
-    form = LoginForm()
+def output():
+    form = RegistrationForm()
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
         if user and user.check_password(form.password.data):
             login_user(user)
-            return redirect(url_for('chat_page'))
+            return redirect(url_for('menu'))
         else:
             pass
     return render_template("login.html", form=form)
@@ -135,11 +139,12 @@ def run_code():
                                error=error)
 
     return render_template('comp.html',
-                         code='''# Пример кода
+                        code='''
+# Пример кода
 a = int(input("Введите первое число: "))
 b = int(input("Введите второе число: "))
 print(f"Сумма: {a + b}")''',
-                         user_input='10\n20')
+                        user_input='10\n20')
 
 
 @app.route('/translate', methods=['GET', 'POST'])
@@ -163,7 +168,8 @@ def translate_text():
 
 @app.route('/menu', methods=['GET', 'POST'])
 def menu():
-    return render_template("")
+    return render_template("menu.html")
+
 
 if __name__ == '__main__':
     with app.app_context():
