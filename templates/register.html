@@ -127,7 +127,7 @@
                             <div class="alert alert-danger">{{ message }}</div>
                         {% endif %}
 
-                        <form method="POST" action="{{ url_for('output') }}">
+                        <form method="POST" action="{{ url_for('main_reg') }}">
                             {{ form.hidden_tag() }}
                             <div class="mb-3">
                                 {{ form.email.label(class="form-label") }}

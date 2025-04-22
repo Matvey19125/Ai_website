@@ -122,7 +122,7 @@
                         <h3>Вход в ПроКод</h3>
                         <p class="mb-0">Продолжите своё обучение программированию</p>
                     </div>
-                    <div class="card-body p-4">
+                     <div class="card-body p-4">
                         {% with messages = get_flashed_messages(with_categories=true) %}
                             {% if messages %}
                                 {% for category, message in messages %}
@@ -131,7 +131,7 @@
                             {% endif %}
                         {% endwith %}
 
-                        <form method="POST" action="{{ url_for('menu') }}">
+                        <form method="POST" action="{{ url_for('output') }}">
                             {{ form.hidden_tag() }}
                             <div class="mb-3">
                                 {{ form.email.label(class="form-label") }}
@@ -151,7 +151,6 @@
                                 Войти
                             </button>
                         </form>
-
                         <div class="text-center mt-3">
                             <span class="text-muted" style="font-size: 0.9rem;">Ещё нет аккаунта? </span>
                             <a href="/" class="link-accent">

@@ -137,12 +137,17 @@
                             </div>
                         </form>
 
-                        {% if translation_result %}
-                            <div class="translation-result">
-                                <h5 class="fw-bold mb-3"><i class="bi bi-check-circle-fill text-success me-2"></i>Результат перевода</h5>
-                                <p class="mb-0">{{ translation_result }}</p>
-                            </div>
-                        {% endif %}
+                      {% if translation_result %}
+<div class="translation-result">
+    <h5><i class="bi bi-check-circle-fill text-success me-2"></i> Исходный текст:</h5>
+    <p>{{ original_text }}</p>
+
+    <hr />
+
+    <h5><i class="bi bi-check-circle-fill text-success me-2"></i> Перевод текста:</h5>
+    <p>{{ translation_result }}</p>
+</div>
+{% endif %}
                     </div>
                 </div>
             </div>

@@ -108,7 +108,7 @@
 </head>
 <body>
     <a href="/menu" class="logout-link">
-        <i class="bi bi-box-arrow-right"></i> Выйти
+        <i class="bi bi-box-arrow-right"></i> Назад в меню
     </a>
 
     <div class="container">
@@ -135,7 +135,7 @@
                                 <textarea class="form-control code-editor" id="code" name="code" rows="12" placeholder="Введите ваш код...">{% if code %}{{ code }}{% else %}# Пример кода
 a = int(input("Введите первое число: "))
 b = int(input("Введите второе число: "))
-print(f"Сумма: {a + b}"){% endif %}</textarea>
+print(a + b){% endif %}</textarea>
                             </div>
 
                             <div class="mb-4">

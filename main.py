@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect, url_for, request, jsonify
+from flask import Flask, render_template, redirect, url_for, request, jsonify, flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, current_user, login_required
 from flask_wtf import FlaskForm
@@ -11,16 +11,24 @@ import subprocess
 import sys
 import os
 from deep_translator import GoogleTranslator
+from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
 
-app.config['SECRET_KEY'] = 'your-secret-key-here'
+app.config['SECRET_KEY'] = 'negt7821-Igoryan'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///password.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-
+app.config['UPLOAD_FOLDER'] = 'static/uploads'
+app.config['MAX_CONTENT_LENGTH'] = 50 * 1024 * 1024  # 50MB limit
+ALLOWED_EXTENSIONS = {'mp3', 'wav', 'ogg', 'm4a', 'flac'}
 db = SQLAlchemy(app)
 login_manager = LoginManager(app)
 login_manager.login_view = 'output'
+
+
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
 class User(db.Model, UserMixin):
@@ -45,6 +53,7 @@ class RegistrationForm(FlaskForm):
         Length(min=8, message='Пароль должен содержать минимум 8 символов')
     ])
     submit = SubmitField('Зарегистрироваться')
+
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -75,11 +84,14 @@ def output():
     form = RegistrationForm()
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
-        if user and user.check_password(form.password.data):
-            login_user(user)
-            return redirect(url_for('menu'))
+        if user:
+            if user.check_password(form.password.data):
+                login_user(user)
+                return redirect(url_for('menu'))
+            else:
+                flash('Неверный пароль', 'error')
         else:
-            pass
+            flash('Пользователь с таким email не найден', 'error')
     return render_template("login.html", form=form)
 
 
@@ -143,16 +155,17 @@ def run_code():
 # Пример кода
 a = int(input("Введите первое число: "))
 b = int(input("Введите второе число: "))
-print(f"Сумма: {a + b}")''',
+print(a + b)''',
                         user_input='10\n20')
 
 
 @app.route('/translate', methods=['GET', 'POST'])
 def translate_text():
     if request.method == 'POST':
-        text_to_translate = request.form['text']
+        text_to_translate = request.form['text'].strip()
         target_language = request.form.get('target_lang')
-        if not text_to_translate.strip():
+
+        if not text_to_translate:
             translated_text = ''
         else:
             try:
@@ -160,15 +173,108 @@ def translate_text():
             except Exception as e:
                 print(f'Ошибка перевода: {e}')
                 translated_text = f'Перевод невозможен: ошибка'
-    else:
-        translated_text = None
 
-    return render_template('translator.html', translation_result=translated_text)
+        return render_template(
+            'translator.html',
+            original_text=text_to_translate,
+            translation_result=translated_text
+        )
+    else:
+        return render_template('translator.html')
 
 
 @app.route('/menu', methods=['GET', 'POST'])
 def menu():
     return render_template("menu.html")
+
+
+@app.route('/music', methods=['GET', 'POST'])
+@login_required
+def music():
+    if request.method == 'POST':
+        if 'musicFiles[]' not in request.files:
+            flash('No file part', 'error')
+            return redirect(request.url)
+        files = request.files.getlist('musicFiles[]')
+        user_folder = os.path.join(app.config['UPLOAD_FOLDER'], str(current_user.id))
+        os.makedirs(user_folder, exist_ok=True)
+        uploaded_files = []
+        for file in files:
+            if file.filename == '':
+                flash('No selected file', 'error')
+                continue
+            if file and allowed_file(file.filename):
+                filename = secure_filename(file.filename)
+                filepath = os.path.join(user_folder, filename)
+                if os.path.exists(filepath):
+                    flash(f'File {filename} already exists', 'warning')
+                    continue
+                file.save(filepath)
+                uploaded_files.append(filename)
+                flash(f'File {filename} successfully uploaded', 'success')
+
+        return redirect(url_for('music'))
+    user_folder = os.path.join(app.config['UPLOAD_FOLDER'], str(current_user.id))
+    existing_files = []
+    if os.path.exists(user_folder):
+        existing_files = sorted(os.listdir(user_folder))
+    return render_template("music.html", existing_files=existing_files)
+
+
+@app.route('/books', methods=['GET', 'POST'])
+@login_required
+def pdf_upload():
+    def allowed_file(filename):
+        return '.' in filename and filename.rsplit('.', 1)[1].lower() == 'pdf'
+    if request.method == 'POST':
+        if 'pdfFiles[]' not in request.files:
+            flash('No file part', 'error')
+            return redirect(url_for('pdf_upload'))
+        files = request.files.getlist('pdfFiles[]')
+        user_folder = os.path.join(app.config['UPLOAD_FOLDER'], 'pdfs', str(current_user.id))
+        os.makedirs(user_folder, exist_ok=True)
+        uploaded_files = []
+        for file in files:
+            if file.filename == '':
+                flash('No selected file', 'error')
+                continue
+            if file and allowed_file(file.filename):
+                filename = secure_filename(file.filename)
+                filepath = os.path.join(user_folder, filename)
+                if os.path.exists(filepath):
+                    flash(f'File {filename} already exists', 'warning')
+                    continue
+                file.save(filepath)
+                uploaded_files.append(filename)
+                flash(f'File {filename} successfully uploaded', 'success')
+            else:
+                flash(f'File {file.filename} is not a PDF', 'error')
+        return redirect(url_for('pdf_upload'))
+    user_folder = os.path.join(app.config['UPLOAD_FOLDER'], 'pdfs', str(current_user.id))
+    existing_files = []
+    if os.path.exists(user_folder):
+        existing_files = sorted([f for f in os.listdir(user_folder) if f.lower().endswith('.pdf')])
+
+    return render_template("document.html", existing_files=existing_files)
+
+
+@app.route('/delete_book/<filename>', methods=['POST'])
+@login_required
+def delete_book(filename):
+    user_folder = os.path.join(app.config['UPLOAD_FOLDER'], 'pdfs', str(current_user.id))
+    filepath = os.path.join(user_folder, filename)
+
+    if os.path.exists(filepath):
+        os.remove(filepath)
+        flash(f'Файл {filename} успешно удалён', 'success')
+    else:
+        flash(f'Файл {filename} не найден', 'error')
+
+    return redirect(url_for('pdf_upload'))
+
+def allowed_pdf_file(filename):
+    return '.' in filename and \
+        filename.rsplit('.', 1)[1].lower() in {'pdf'}
 
 
 if __name__ == '__main__':
