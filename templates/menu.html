@@ -23,6 +23,7 @@
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             color: var(--text-main);
             padding: 2rem 0;
+            position: relative;
         }
 
         .header-card {
@@ -32,6 +33,7 @@
             background: var(--card-bg);
             margin-bottom: 2rem;
             padding: 2rem;
+            position: relative;
         }
 
         .feature-card {
@@ -128,10 +130,53 @@
         .feature-description {
             flex: 1;
         }
+
+        .logout-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: white;
+            background-color: var(--primary);
+            border: none;
+            border-radius: 8px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            box-shadow: 0 2px 4px rgba(37, 99, 235, 0.1);
+        }
+
+        .logout-btn:hover {
+            background-color: #1d4ed8;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(37, 99, 235, 0.15);
+        }
+
+        .logout-btn i {
+            margin-right: 6px;
+        }
+
+        @media (max-width: 576px) {
+            .logout-btn {
+                top: 1rem;
+                right: 1rem;
+                padding: 0.4rem 0.8rem;
+                font-size: 0.8rem;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="container">
+        <a href="/" class="logout-btn">
+            <i class="bi bi-box-arrow-right"></i> Выйти
+        </a>
+
         <div class="header-card text-center">
             <div class="logo-icon">
                 <svg width="30" height="30" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
