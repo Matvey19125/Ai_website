@@ -145,6 +145,7 @@
             margin-bottom: 1rem;
             transition: all 0.2s;
             background-color: #f8fafc;
+            position: relative;
         }
 
         .track-item:hover {
@@ -155,6 +156,7 @@
         .track-info {
             flex-grow: 1;
             margin-left: 1rem;
+            margin-right: 1rem;
         }
 
         .track-name {
@@ -169,8 +171,9 @@
         }
 
         audio {
-            width: 100%;
+            width: 300px;
             border-radius: 8px;
+            margin-right: 10px;
         }
 
         .empty-state {
@@ -184,6 +187,7 @@
             margin-bottom: 1rem;
             color: #cbd5e1;
         }
+
         .logout-link {
             position: absolute;
             top: 20px;
@@ -192,26 +196,52 @@
             font-weight: 500;
             text-decoration: none;
         }
+
         .logout-link:hover {
             color: #1d4ed8;
             text-decoration: underline;
+        }
+
+        .delete-btn {
+            background-color: transparent;
+            color: #dc2626;
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 6px;
+            font-weight: 500;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+        }
+
+        .delete-btn:hover {
+            background-color: #fee2e2;
+            color: #b91c1c;
+        }
+
+        .track-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
     </style>
 </head>
 <body>
     <a href="/menu" class="logout-link">
-       <i class="bi bi-box-arrow-right"></i> Назад в меню
+        <i class="bi bi-box-arrow-right"></i> Назад в меню
     </a>
     <div class="container music-container">
         <audio autoplay loop muted id="globalAudioPlayer">
             <source src="{{ url_for('static', filename='uploads/' + current_user.id|string + '/your_audio.mp3') }}" type="audio/mpeg">
-        Ваш браузер не поддерживает аудио элементы.
+            Ваш браузер не поддерживает аудио элементы.
         </audio>
         <div class="header-section">
             <div class="logo-icon">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M9 18V5L21 3V16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    <path d="M6 21C7.65685 21 9 19.6569 9 18C9 16.3431 7.65685 15 6 15C4.34315 15 3 16.3431 3 18C3 19.6569 4.34315 21 6 21Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M6 21C7.65685 21 9 19.6569 9 18C9 16.3431 7.65685 15 6 15C4.34315 15 3 16.3431 3 18C3 19.656915V19C21 4.34315 21 6 21Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                     <path d="M18 19C19.6569 19 21 17.6569 21 16C21 14.3431 19.6569 13 18 13C16.3431 13 15 14.3431 15 16C15 17.6569 16.3431 19 18 19Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
             </div>
@@ -244,7 +274,7 @@
                             <path d="M21 15V19C21 20.1046 20.1046 21 19 21H5C3.89543 21 3 20.1046 3 19V15" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                             <path d="M17 8L12 3M12 3L7 8M12 3V15" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                         </svg>
-                        <h5>Перетащите файлы сюда или нажмите для выбора</h5>
+                        <h5>Нажмите для выбора файлов</h5>
                         <p class="text-muted">Поддерживаемые форматы: MP3, WAV, OGG, M4A, FLAC (макс. 50MB)</p>
                     </label>
                     <button type="submit" class="upload-btn">Загрузить выбранные файлы</button>
@@ -269,10 +299,21 @@
                             <div class="track-name">{{ file }}</div>
                             <div class="track-duration">Загружен: {{ file.split('.')[0]|truncate(20) }}</div>
                         </div>
-                        <audio controls>
-                            <source src="{{ url_for('static', filename='uploads/' + current_user.id|string + '/' + file) }}">
-                            Ваш браузер не поддерживает аудио элемент.
-                        </audio>
+                        <div class="track-controls">
+                            <audio controls style="flex-grow: 1;">
+                                <source src="{{ url_for('static', filename='uploads/' + current_user.id|string + '/' + file) }}">
+                                Ваш браузер не поддерживает аудио элемент.
+                            </audio>
+                            <form method="post" action="{{ url_for('delete_track') }}" style="display: inline;">
+                                <input type="hidden" name="filename" value="{{ file }}">
+                                <button type="submit" class="delete-btn">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M19 7L18.1327 19.1425C18.0579 20.1891 17.187 21 16.1378 21H7.86224C6.81296 21 5.94208 20.1891 5.86732 19.1425L5 7M10 11V17M14 11V17M15 7V4C15 3.44772 14.5523 3 14 3H10C9.44772 3 9 3.44772 9 4V7M4 7H20" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                    Удалить
+                                </button>
+                            </form>
+                        </div>
                     </div>
                 {% endfor %}
             {% else %}
@@ -290,7 +331,5 @@
             {% endif %}
         </div>
     </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

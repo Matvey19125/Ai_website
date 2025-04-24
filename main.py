@@ -13,6 +13,12 @@ import os
 from deep_translator import GoogleTranslator
 from werkzeug.utils import secure_filename
 
+
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
 app = Flask(__name__)
 
 app.config['SECRET_KEY'] = 'negt7821-Igoryan'
@@ -24,11 +30,6 @@ ALLOWED_EXTENSIONS = {'mp3', 'wav', 'ogg', 'm4a', 'flac'}
 db = SQLAlchemy(app)
 login_manager = LoginManager(app)
 login_manager.login_view = 'output'
-
-
-def allowed_file(filename):
-    return '.' in filename and \
-           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
 class User(db.Model, UserMixin):
@@ -153,8 +154,8 @@ def run_code():
     return render_template('comp.html',
                         code='''
 # Пример кода
-a = int(input("Введите первое число: "))
-b = int(input("Введите второе число: "))
+a = int(input())
+b = int(input())
 print(a + b)''',
                         user_input='10\n20')
 
@@ -220,6 +221,29 @@ def music():
         existing_files = sorted(os.listdir(user_folder))
     return render_template("music.html", existing_files=existing_files)
 
+
+@app.route('/delete_track', methods=['POST'])
+@login_required
+def delete_track():
+    filename = request.form.get('filename')
+    if not filename:
+        flash('Не указано имя файла для удаления', 'error')
+        return redirect(url_for('music'))
+
+    user_folder = os.path.join(app.config['UPLOAD_FOLDER'], str(current_user.id))
+    filepath = os.path.join(user_folder, filename)
+
+    if os.path.exists(filepath):
+        os.remove(filepath)
+        flash(f'Файл {filename} успешно удален', 'success')
+    else:
+        flash(f'Файл {filename} не найден', 'error')
+
+    return redirect(url_for('music'))
+
+@app.route("/razvil", methods=["GET", "POST"])
+def razvil():
+    return render_template("razvil.html")
 
 @app.route('/books', methods=['GET', 'POST'])
 @login_required
