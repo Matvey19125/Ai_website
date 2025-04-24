@@ -12,6 +12,7 @@ import sys
 import os
 from deep_translator import GoogleTranslator
 from werkzeug.utils import secure_filename
+import shutil
 
 
 def allowed_file(filename):
@@ -245,18 +246,30 @@ def delete_track():
 def razvil():
     return render_template("razvil.html")
 
+
 @app.route('/books', methods=['GET', 'POST'])
 @login_required
 def pdf_upload():
     def allowed_file(filename):
         return '.' in filename and filename.rsplit('.', 1)[1].lower() == 'pdf'
+    REQUIRED_BOOK = "Ваш первый учебник.pdf"
+    static_books_dir = os.path.join(app.static_folder, 'books')
+    user_folder = os.path.join(app.config['UPLOAD_FOLDER'], 'pdfs', str(current_user.id))
+    os.makedirs(user_folder, exist_ok=True)
+    required_book_src = os.path.join(static_books_dir, REQUIRED_BOOK)
+    required_book_dst = os.path.join(user_folder, REQUIRED_BOOK)
+
+    if not os.path.exists(required_book_dst) and os.path.exists(required_book_src):
+        try:
+            shutil.copy2(required_book_src, required_book_dst)
+            flash(f'Обязательный учебник {REQUIRED_BOOK} был добавлен в вашу библиотеку', 'info')
+        except Exception as e:
+            flash(f'Не удалось скопировать обязательный учебник: {str(e)}', 'error')
     if request.method == 'POST':
         if 'pdfFiles[]' not in request.files:
             flash('No file part', 'error')
             return redirect(url_for('pdf_upload'))
         files = request.files.getlist('pdfFiles[]')
-        user_folder = os.path.join(app.config['UPLOAD_FOLDER'], 'pdfs', str(current_user.id))
-        os.makedirs(user_folder, exist_ok=True)
         uploaded_files = []
         for file in files:
             if file.filename == '':
@@ -274,7 +287,6 @@ def pdf_upload():
             else:
                 flash(f'File {file.filename} is not a PDF', 'error')
         return redirect(url_for('pdf_upload'))
-    user_folder = os.path.join(app.config['UPLOAD_FOLDER'], 'pdfs', str(current_user.id))
     existing_files = []
     if os.path.exists(user_folder):
         existing_files = sorted([f for f in os.listdir(user_folder) if f.lower().endswith('.pdf')])
