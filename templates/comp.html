@@ -104,13 +104,17 @@
             color: #1d4ed8;
             text-decoration: underline;
         }
+
+        .project-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
     </style>
 </head>
 <body>
     <a href="/menu" class="logout-link">
         <i class="bi bi-box-arrow-right"></i> Назад в меню
     </a>
-
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-lg-10">
@@ -127,45 +131,107 @@
                         </div>
                     </div>
                 </div>
-                 <div class="card compiler-card mb-4">
-                    <div class="card-body">
-                        <form method="POST" action="/python">
-                            <div class="mb-4">
-                                <label for="code" class="form-label fw-bold">Ваш код Python</label>
-                                <textarea class="form-control code-editor" id="code" name="code" rows="12" placeholder="Введите ваш код...">{% if code %}{{ code }}{% else %}# Пример кода
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="card compiler-card mb-4">
+                            <div class="card-body">
+                                <h5 class="mb-3"><i class="bi bi-folder-plus"></i> Управление проектами</h5>
+                                <form method="POST" action="/create_project" class="mb-4">
+                                    <div class="input-group mb-3">
+                                        <input type="text" class="form-control" name="project_name" placeholder="Название проекта" required>
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="bi bi-plus-circle"></i> Создать
+                                        </button>
+                                    </div>
+                                </form>
+                                {% if projects %}
+                                <h5 class="mb-3"><i class="bi bi-collection"></i> Мои проекты</h5>
+                                <div class="project-list">
+                                    <div class="list-group">
+                                        {% for project in projects %}
+                                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                                            <a href="/load_project/{{ project }}" class="text-decoration-none flex-grow-1">
+                                                <i class="bi bi-folder me-2"></i>{{ project }}
+                                            </a>
+                                            <form method="POST" action="/delete_project/{{ project }}" class="ms-2">
+                                                <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                {% else %}
+                                <div class="alert alert-info">
+                                    <i class="bi bi-info-circle"></i> У вас пока нет проектов. Создайте свой первый проект!
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-8">
+                        <div class="card compiler-card mb-4">
+                            <div class="card-body">
+                                {% if project_name %}
+                                <div class="alert alert-info mb-3">
+                                    <i class="bi bi-info-circle"></i> Вы редактируете проект: <strong>{{ project_name }}</strong>
+                                </div>
+                                {% endif %}
+
+                                <form method="POST" action="/python">
+                                    {% if project_name %}
+                                    <input type="hidden" name="project_name" value="{{ project_name }}">
+                                    {% endif %}
+
+                                    <div class="mb-4">
+                                        <label for="code" class="form-label fw-bold">Ваш код Python</label>
+                                        <textarea class="form-control code-editor" id="code" name="code" rows="12" placeholder="Введите ваш код...">{% if code %}{{ code }}{% else %}# Пример кода
 a = int(input())
 b = int(input())
 print(a + b){% endif %}</textarea>
-                            </div>
+                                    </div>
 
-                            <div class="mb-4">
-                                <label for="user_input" class="form-label fw-bold">Входные данные</label>
-                                <textarea class="form-control code-editor" id="user_input" name="input" rows="3" placeholder="Введите входные данные, каждое значение на новой строке...">{% if user_input %}{{ user_input }}{% else %}10
+                                    <div class="mb-4">
+                                        <label for="user_input" class="form-label fw-bold">Входные данные</label>
+                                        <textarea class="form-control code-editor" id="user_input" name="input" rows="3" placeholder="Введите входные данные, каждое значение на новой строке...">{% if user_input %}{{ user_input }}{% else %}10
 20{% endif %}</textarea>
-                            </div>
+                                    </div>
 
-                            <button type="submit" class="btn btn-primary w-100 py-2">
-                                <i class="bi bi-play-fill"></i> Запустить код
-                            </button>
-                        </form>
+                                    <div class="d-flex justify-content-between">
+                                        {% if project_name %}
+                                        <button type="submit" name="action" value="save" class="btn btn-outline-primary">
+                                            <i class="bi bi-save"></i> Сохранить проект
+                                        </button>
+                                        {% endif %}
+                                        <button type="submit" name="action" value="run" class="btn btn-primary ms-auto">
+                                            <i class="bi bi-play-fill"></i> Запустить код
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+
+                        {% if output %}
+                        <div class="card compiler-card mb-4">
+                            <div class="card-body">
+                                <h5 class="mb-3"><i class="bi bi-check-circle-fill text-success me-2"></i>Результат выполнения</h5>
+                                <div class="output-area">{{ output }}</div>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        {% if error %}
+                        <div class="card compiler-card mb-4">
+                            <div class="card-body">
+                                <h5 class="mb-3"><i class="bi bi-exclamation-triangle-fill text-danger me-2"></i>Ошибка выполнения</h5>
+                                <div class="output-area error-area">{{ error }}</div>
+                            </div>
+                        </div>
+                        {% endif %}
                     </div>
                 </div>
-                {% if output %}
-                <div class="card compiler-card mb-4">
-                    <div class="card-body">
-                        <h5 class="mb-3"><i class="bi bi-check-circle-fill text-success me-2"></i>Результат выполнения</h5>
-                        <div class="output-area">{{ output }}</div>
-                    </div>
-                </div>
-                {% endif %}
-                {% if error %}
-                <div class="card compiler-card mb-4">
-                    <div class="card-body">
-                        <h5 class="mb-3"><i class="bi bi-exclamation-triangle-fill text-danger me-2"></i>Ошибка выполнения</h5>
-                        <div class="output-area error-area">{{ error }}</div>
-                    </div>
-                </div>
-                {% endif %}
             </div>
         </div>
     </div>

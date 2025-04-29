@@ -115,40 +115,51 @@
                         </div>
                     </div>
                 </div>
-                <div class="card project-card mb-4">
-                    <div class="card-body text-center">
-                        <i class="bi bi-plus-circle project-icon"></i>
-                        <h4>Новый проект</h4>
-                        <p class="text-muted mb-4">Создайте новый Python проект с нуля</p>
-                        <a href="/python/compiler" class="btn btn-primary">
-                            <i class="bi bi-plus-lg"></i> Создать проект
-                        </a>
-                    </div>
-                </div>
-                <div id="projects-container" class="mb-4">
-                    <div class="empty-state">
-                        <i class="bi bi-folder" style="font-size: 3rem; color: var(--text-muted);"></i>
-                        <h4 class="mt-3">У вас пока нет проектов</h4>
-                        <p>Создайте свой первый проект, нажав кнопку выше</p>
-                    </div>
-                </div>
-                <div class="card project-card mb-4 d-none" id="project-template">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <h4 class="mb-1">Название проекта</h4>
-                                <small class="text-muted">Последнее изменение: <span class="last-modified">сегодня</span></small>
+
+                <form action="{{ url_for('create_project') }}" method="POST">
+                    <div class="card project-card mb-4">
+                        <div class="card-body">
+                            <div class="form-group mb-3">
+                                <label for="project-name-input">Имя проекта:</label>
+                                <input type="text" class="form-control" id="project-name-input" name="project_name" placeholder="my_project.py" required>
+                                <small class="text-muted">Имя должно заканчиваться на .py</small>
                             </div>
-                            <div>
-                                <a href="#" class="btn btn-outline-primary btn-sm me-2">
-                                    <i class="bi bi-pencil"></i> Редактировать
-                                </a>
-                                <a href="#" class="btn btn-outline-danger btn-sm">
-                                    <i class="bi bi-trash"></i> Удалить
-                                </a>
-                            </div>
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="bi bi-plus-lg"></i> Создать новый проект
+                            </button>
                         </div>
                     </div>
+                </form>
+
+                <div id="projects-container" class="mb-4">
+                    {% if existing_projects %}
+                        {% for project in existing_projects %}
+                            <div class="card project-card mb-3">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h4 class="mb-1">{{ project.name }}</h4>
+                                            <small class="text-muted">Последнее изменение: {{ project.last_modified }}</small>
+                                        </div>
+                                        <div>
+                                            <a href="{{ url_for('edit_project', filename=project.name) }}" class="btn btn-outline-primary btn-sm me-2">
+                                                <i class="bi bi-pencil"></i> Редактировать
+                                            </a>
+                                            <a href="{{ url_for('delete_project', filename=project.name) }}" class="btn btn-outline-danger btn-sm">
+                                                <i class="bi bi-trash"></i> Удалить
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="empty-state">
+                            <i class="bi bi-folder" style="font-size: 3rem; color: var(--text-muted);"></i>
+                            <h4 class="mt-3">У вас пока нет проектов</h4>
+                            <p>Создайте свой первый проект, заполнив форму выше</p>
+                        </div>
+                    {% endif %}
                 </div>
             </div>
         </div>

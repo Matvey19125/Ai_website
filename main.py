@@ -17,11 +17,11 @@ import shutil
 
 def allowed_file(filename):
     return '.' in filename and \
-           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+        filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
 app = Flask(__name__)
-
+app.config['PROJECTS_FOLDER'] = 'static/projects'
 app.config['SECRET_KEY'] = 'negt7821-Igoryan'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///password.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -114,17 +114,101 @@ def chat_page():
     return render_template('chat.html')
 
 
+@app.route('/create_project', methods=['POST'])
+@login_required
+def create_project():
+    project_name = request.form.get('project_name')
+    if not project_name:
+        flash('Не указано название проекта', 'error')
+        return redirect(url_for('run_code'))
+    user_folder = os.path.join(app.config['PROJECTS_FOLDER'], str(current_user.id))
+    os.makedirs(user_folder, exist_ok=True)
+    project_folder = os.path.join(user_folder, secure_filename(project_name))
+    if os.path.exists(project_folder):
+        flash('Проект с таким именем уже существует', 'error')
+        return redirect(url_for('run_code'))
+    os.makedirs(project_folder)
+    with open(os.path.join(project_folder, 'main.py'), 'w', encoding='utf-8') as f:
+        f.write('''# Ваш код Python
+print("Привет, мир!")''')
+    flash(f'Проект "{project_name}" успешно создан', 'success')
+    return redirect(url_for('run_code'))
+
+
+@app.route('/save_project/<project_name>', methods=['POST'])
+@login_required
+def save_project(project_name):
+    code = request.form.get('code', '').rstrip()
+    user_folder = os.path.join(app.config['PROJECTS_FOLDER'], str(current_user.id))
+    project_folder = os.path.join(user_folder, secure_filename(project_name))
+    if not os.path.exists(project_folder):
+        flash('Проект не найден', 'error')
+        return redirect(url_for('run_code'))
+    try:
+        with open(os.path.join(project_folder, 'main.py'), 'w', encoding='utf-8') as f:
+            f.write(code)
+        flash('Проект успешно сохранен', 'success')
+    except Exception as e:
+        flash(f'Ошибка при сохранении проекта: {str(e)}', 'error')
+    return redirect(url_for('load_project', project_name=project_name))
+
+
+@app.route('/load_project/<project_name>')
+@login_required
+def load_project(project_name):
+    user_folder = os.path.join(app.config['PROJECTS_FOLDER'], str(current_user.id))
+    project_folder = os.path.join(user_folder, secure_filename(project_name))
+    if not os.path.exists(project_folder):
+        flash('Проект не найден', 'error')
+        return redirect(url_for('run_code'))
+    main_file = os.path.join(project_folder, 'main.py')
+    if os.path.exists(main_file):
+        with open(main_file, 'r', encoding='utf-8') as f:
+            code = f.read().rstrip() + "\n"
+    else:
+        code = '# Файл main.py не найден'
+
+    return render_template('comp.html',
+                           code=code,
+                           project_name=project_name,
+                           projects=get_user_projects(current_user.id))
+
+
+def get_user_projects(user_id):
+    user_folder = os.path.join(app.config['PROJECTS_FOLDER'], str(user_id))
+    if os.path.exists(user_folder):
+        return sorted([d for d in os.listdir(user_folder)
+                       if os.path.isdir(os.path.join(user_folder, d))])
+    return []
+
+
 @app.route('/python', methods=['GET', 'POST'])
+@login_required
 def run_code():
     if request.method == 'POST':
-        code = request.form['code']
+        code = request.form.get('code', '')
+        code = code.rstrip()
         user_input = request.form.get('input', '')
+        project_name = request.form.get('project_name', '')
         output = ""
         error = ""
+        if project_name:
+            user_folder = os.path.join(app.config['PROJECTS_FOLDER'], str(current_user.id))
+            project_folder = os.path.join(user_folder, secure_filename(project_name))
+
+            if os.path.exists(project_folder):
+                try:
+                    with open(os.path.join(project_folder, 'main.py'), 'w', encoding='utf-8') as f:
+                        f.write(code)
+                        # Добавляем один перенос строки в конце файла
+                        f.write('\n')
+                except Exception as e:
+                    flash(f'Ошибка при сохранении проекта: {str(e)}', 'error')
         try:
             inputs = user_input.strip().splitlines()
             with open('temp_code.py', 'w', encoding='utf-8') as f:
                 f.write(code)
+                f.write('\n')
             with open('temp_input.txt', 'w', encoding='utf-8') as f:
                 f.write("\n".join(inputs))
             process = subprocess.Popen(
@@ -150,16 +234,30 @@ def run_code():
                                code=code,
                                user_input=user_input,
                                output=output,
-                               error=error)
-
+                               error=error,
+                               project_name=project_name,
+                               projects=get_user_projects(current_user.id))
     return render_template('comp.html',
-                        code='''
-# Пример кода
+                           code='''# Пример кода
 a = int(input())
 b = int(input())
 print(a + b)''',
-                        user_input='10\n20')
+                           user_input='10\n20',
+                           projects=get_user_projects(current_user.id))
 
+
+@app.route('/delete_project/<project_name>', methods=['POST'])
+@login_required
+def delete_project(project_name):
+    user_folder = os.path.join(app.config['PROJECTS_FOLDER'], str(current_user.id))
+    project_folder = os.path.join(user_folder, secure_filename(project_name))
+
+    if os.path.exists(project_folder):
+        shutil.rmtree(project_folder)
+        flash(f'Проект "{project_name}" успешно удален', 'success')
+    else:
+        flash('Проект не найден', 'error')
+    return redirect(url_for('run_code'))
 
 @app.route('/translate', methods=['GET', 'POST'])
 def translate_text():
@@ -242,6 +340,7 @@ def delete_track():
 
     return redirect(url_for('music'))
 
+
 @app.route("/razvil", methods=["GET", "POST"])
 def razvil():
     return render_template("razvil.html")
@@ -307,6 +406,7 @@ def delete_book(filename):
         flash(f'Файл {filename} не найден', 'error')
 
     return redirect(url_for('pdf_upload'))
+
 
 def allowed_pdf_file(filename):
     return '.' in filename and \
