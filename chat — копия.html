@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Чат с ИИ | ПроКод</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --secondary: #4f46e5;
+            --accent: #4f46e5;
+            --dark: #1e293b;
+            --light-bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #334155;
+            --text-muted: #64748b;
+        }
+
+        body {
+            background-color: var(--light-bg);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            color: var(--text-main);
+        }
+
+        .chat-card {
+            border: none;
+            border-radius: 14px;
+            box-shadow: 0 4px 20px rgba(15, 23, 42, 0.05);
+            background: var(--card-bg);
+            overflow: hidden;
+        }
+
+        .card-header {
+            background: var(--card-bg);
+            color: var(--dark);
+            padding: 2rem 1.5rem 1rem;
+            text-align: center;
+            border-bottom: 1px solid rgba(226, 232, 240, 0.7);
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            border: none;
+            padding: 0.75rem;
+            font-weight: 500;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+
+        .btn-primary:hover {
+            background-color: #1d4ed8;
+            transform: translateY(-1px);
+        }
+
+        .form-control {
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            transition: border-color 0.2s;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .logo-icon {
+            width: 48px;
+            height: 48px;
+            margin: 0 auto 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+            border-radius: 12px;
+            color: var(--primary);
+        }
+
+        .link-accent {
+            color: var(--accent);
+            font-weight: 500;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .link-accent:hover {
+            color: #0d9488;
+            text-decoration: underline;
+        }
+
+        h3 {
+            font-weight: 600;
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .ai-response {
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            padding: 1rem;
+            margin-top: 1rem;
+            border-left: 4px solid var(--primary);
+        }
+
+        .user-message {
+            font-weight: 500;
+            color: var(--primary);
+        }
+
+        .logout-link {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            color: var(--accent);
+            font-weight: 500;
+            text-decoration: none;
+        }
+        .logout-link:hover {
+            color: #1d4ed8;
+            text-decoration: underline;
+        }
+
+        .quote-box {
+            font-style: italic;
+            color: var(--text-muted);
+            font-size: 1rem;
+            margin: 1rem auto 1.5rem;
+            padding: 1rem;
+            border-left: 4px solid var(--primary);
+            background-color: rgba(37, 99, 235, 0.05);
+            border-radius: 0 8px 8px 0;
+            max-width: 600px;
+        }
+    </style>
+</head>
+<body>
+    <a href="/menu" class="logout-link">
+        <i class="bi bi-box-arrow-right"></i> Назад в меню
+    </a>
+    <div class="container py-5">
+        <div class="row justify-content-center mb-4">
+            <div class="col-md-8 text-center">
+                <div class="logo-icon mx-auto">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>
+                    </svg>
+                </div>
+                <h3 class="text-dark">Чат с ИИ</h3>
+                <p class="text-muted">Ваш помощник в обучении программированию</p>
+                <div class="quote-box">
+                    "Искусственный интеллект - это зеркало, отражающее человеческий разум. То, что мы видим в нём, говорит больше о нас самих, чем о самой технологии."<br>
+                    <small>- Макс Тегмарк, физик и автор книги "Жизнь 3.0"</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card chat-card mb-4">
+                    <div class="card-body">
+                        <form method="POST" action="/chat">
+                            <div class="mb-3">
+                                <label for="user_input" class="form-label">Ваш запрос:</label>
+                                <textarea class="form-control" id="user_input" name="user_input" rows="4" required>{{ user_input or '' }}</textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100">Отправить</button>
+                        </form>
+                    </div>
+                </div>
+
+                {% if error %}
+                    <div class="alert alert-danger">{{ error }}</div>
+                {% endif %}
+                {% if response %}
+                    <div class="card chat-card">
+                        <div class="card-body">
+                            <h5 class="card-title text-dark">Ответ ИИ</h5>
+                            {% if user_input %}
+                                <p class="user-message mb-3">Вы: {{ user_input }}</p>
+                            {% endif %}
+                            <div class="ai-response">
+                                {{ response }}
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</body>
+</html>
