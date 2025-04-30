@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Моя музыка | ПроКод</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --secondary: #4f46e5;
+            --accent: #4f46e5;
+            --dark: #1e293b;
+            --light-bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #334155;
+            --text-muted: #64748b;
+        }
+
+        body {
+            background-color: var(--light-bg);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            color: var(--text-main);
+            padding-top: 2rem;
+        }
+
+        .music-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .header-section {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        .logo-icon {
+            width: 48px;
+            height: 48px;
+            margin: 0 auto 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+            border-radius: 12px;
+            color: var(--primary);
+        }
+
+        h1 {
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .quote-card {
+            background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            border-left: 4px solid var(--primary);
+        }
+
+        .quote-text {
+            font-style: italic;
+            color: var(--dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .quote-author {
+            font-weight: 500;
+            color: var(--primary);
+            text-align: right;
+        }
+
+        .upload-section {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 10px rgba(15, 23, 42, 0.05);
+        }
+
+        .upload-container {
+            border: 2px dashed #e2e8f0;
+            padding: 2rem;
+            text-align: center;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .upload-container:hover {
+            border-color: var(--primary);
+            background-color: #f8fafc;
+        }
+
+        .upload-btn {
+            background-color: var(--primary);
+            border: none;
+            padding: 0.75rem 1.5rem;
+            font-weight: 500;
+            border-radius: 8px;
+            color: white;
+            transition: all 0.2s;
+        }
+
+        .upload-btn:hover {
+            background-color: #1d4ed8;
+            transform: translateY(-1px);
+        }
+
+        .tracks-section {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 10px rgba(15, 23, 42, 0.05);
+        }
+
+        .tracks-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .tracks-count {
+            background-color: var(--primary);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .track-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            transition: all 0.2s;
+            background-color: #f8fafc;
+            position: relative;
+        }
+
+        .track-item:hover {
+            background-color: #f1f5f9;
+            transform: translateY(-2px);
+        }
+
+        .track-info {
+            flex-grow: 1;
+            margin-left: 1rem;
+            margin-right: 1rem;
+        }
+
+        .track-name {
+            font-weight: 500;
+            color: var(--dark);
+            margin-bottom: 0.25rem;
+        }
+
+        .track-duration {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        audio {
+            width: 300px;
+            border-radius: 8px;
+            margin-right: 10px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem 0;
+            color: var(--text-muted);
+        }
+
+        .empty-state-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: #cbd5e1;
+        }
+
+        .logout-link {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            color: var(--accent);
+            font-weight: 500;
+            text-decoration: none;
+        }
+
+        .logout-link:hover {
+            color: #1d4ed8;
+            text-decoration: underline;
+        }
+
+        .delete-btn {
+            background-color: transparent;
+            color: #dc2626;
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 6px;
+            font-weight: 500;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+        }
+
+        .delete-btn:hover {
+            background-color: #fee2e2;
+            color: #b91c1c;
+        }
+
+        .track-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+    </style>
+</head>
+<body>
+    <a href="/menu" class="logout-link">
+        <i class="bi bi-box-arrow-right"></i> Назад в меню
+    </a>
+    <div class="container music-container">
+        <audio autoplay loop muted id="globalAudioPlayer">
+            <source src="{{ url_for('static', filename='uploads/' + current_user.id|string + '/your_audio.mp3') }}" type="audio/mpeg">
+            Ваш браузер не поддерживает аудио элементы.
+        </audio>
+        <div class="header-section">
+            <div class="logo-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M9 18V5L21 3V16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M6 21C7.65685 21 9 19.6569 9 18C9 16.3431 7.65685 15 6 15C4.34315 15 3 16.3431 3 18C3 19.6569 4.34315 21 6 21Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M18 19C19.6569 19 21 17.6569 21 16C21 14.3431 19.6569 13 18 13C16.3431 13 15 14.3431 15 16C15 17.6569 16.3431 19 18 19Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </div>
+            <h1>Моя музыкальная коллекция</h1>
+            <p class="subtitle">Здесь собраны все ваши загруженные треки</p>
+        </div>
+
+        <div class="quote-card">
+            <p class="quote-text">"Музыка — это стенография чувств. Чувства, которые люди испытывают, но не могут выразить словами."</p>
+            <p class="quote-author">— Лев Толстой</p>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ 'success' if category == 'success' else 'danger' }} mb-4">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        <div class="upload-section">
+            <h3 class="mb-3">Добавить новые треки</h3>
+            <form method="post" enctype="multipart/form-data">
+                <div class="upload-container">
+                    <input type="file" name="musicFiles[]" accept=".mp3,.wav,.ogg,.m4a,.flac" multiple style="display: none;" id="fileInput">
+                    <label for="fileInput" class="d-block mb-3">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="mb-2">
+                            <path d="M21 15V19C21 20.1046 20.1046 21 19 21H5C3.89543 21 3 20.1046 3 19V15" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M17 8L12 3M12 3L7 8M12 3V15" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        <h5>Нажмите для выбора файлов</h5>
+                        <p class="text-muted">Поддерживаемые форматы: MP3, WAV, OGG, M4A, FLAC (макс. 50MB)</p>
+                    </label>
+                    <button type="submit" class="upload-btn">Загрузить выбранные файлы</button>
+                </div>
+            </form>
+        </div>
+        <div class="tracks-section">
+            <div class="tracks-header">
+                <h3>Мои треки</h3>
+                <span class="tracks-count">{{ existing_files|length }}</span>
+            </div>
+            {% if existing_files %}
+                {% for file in existing_files %}
+                    <div class="track-item">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M3 16V19C3 20.1046 3.89543 21 5 21H8M3 8V5C3 3.89543 3.89543 3 5 3H8M21 8V5C21 3.89543 20.1046 3 19 3H16M21 16V19C21 20.1046 20.1046 21 19 21H16" stroke="#4f46e5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M17 12H7M12 17V7" stroke="#4f46e5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        <div class="track-info">
+                            <div class="track-name">{{ file }}</div>
+                            <div class="track-duration">Загружен: {{ file.split('.')[0]|truncate(20) }}</div>
+                        </div>
+                        <div class="track-controls">
+                            <audio controls style="flex-grow: 1;">
+                                <source src="{{ url_for('static', filename='uploads/' + current_user.id|string + '/' + file) }}">
+                                Ваш браузер не поддерживает аудио элемент.
+                            </audio>
+                            <form method="post" action="{{ url_for('delete_track') }}" style="display: inline;">
+                                <input type="hidden" name="filename" value="{{ file }}">
+                                <button type="submit" class="delete-btn">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M19 7L18.1327 19.1425C18.0579 20.1891 17.187 21 16.1378 21H7.86224C6.81296 21 5.94208 20.1891 5.86732 19.1425L5 7M10 11V17M14 11V17M15 7V4C15 3.44772 14.5523 3 14 3H10C9.44772 3 9 3.44772 9 4V7M4 7H20" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                    Удалить
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state">
+                    <div class="empty-state-icon">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M9 18V5L21 3V16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M6 21C7.65685 21 9 19.6569 9 18C9 16.3431 7.65685 15 6 15C4.34315 15 3 16.3431 3 18C3 19.6569 4.34315 21 6 21Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M18 19C19.6569 19 21 17.6569 21 16C21 14.3431 19.6569 13 18 13C16.3431 13 15 14.3431 15 16C15 17.6569 16.3431 19 18 19Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <h4>Ваша коллекция пуста</h4>
+                    <p>Загрузите свои первые треки, чтобы начать слушать</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>
