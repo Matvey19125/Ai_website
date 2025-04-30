@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Онлайн-переводчик | ПроКод</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --secondary: #4f46e5;
+            --accent: #4f46e5;
+            --dark: #1e293b;
+            --light-bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #334155;
+            --text-muted: #64748b;
+        }
+
+        body {
+            background-color: var(--light-bg);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            color: var(--text-main);
+            padding: 2rem 0;
+        }
+
+        .translator-card {
+            border: none;
+            border-radius: 14px;
+            box-shadow: 0 4px 20px rgba(15, 23, 42, 0.05);
+            background: var(--card-bg);
+            margin-bottom: 2rem;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            border: none;
+            padding: 0.75rem;
+            font-weight: 500;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+
+        .btn-primary:hover {
+            background-color: #1d4ed8;
+            transform: translateY(-1px);
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .translation-result {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 1rem;
+            border-left: 4px solid var(--primary);
+            margin-top: 1.5rem;
+        }
+
+        .header-icon {
+            color: var(--primary);
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .quote {
+            font-style: italic;
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            margin: 1.5rem 0;
+            padding: 1rem;
+            border-left: 4px solid var(--primary);
+            background-color: rgba(37, 99, 235, 0.05);
+            border-radius: 0 8px 8px 0;
+        }
+
+        .logout-link {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            color: var(--accent);
+            font-weight: 500;
+            text-decoration: none;
+        }
+
+        .logout-link:hover {
+            color: #1d4ed8;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <a href="/menu" class="logout-link">
+        <i class="bi bi-box-arrow-right"></i> Назад в меню
+    </a>
+
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card translator-card mb-4">
+                    <div class="card-body text-center">
+                        <i class="bi bi-translate header-icon"></i>
+                        <h2>Онлайн-переводчик</h2>
+                        <div class="quote">
+                            "Знать другой язык — это как иметь вторую душу."<br>
+                            <small>- Карл Великий</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="card translator-card">
+                    <div class="card-body">
+                        <form method="post" action="/translate">
+                            <div class="mb-4">
+                                <label for="text" class="form-label fw-bold">Текст для перевода</label>
+                                <textarea name="text" id="text" class="form-control" rows="6" placeholder="Введите текст для перевода..."></textarea>
+                            </div>
+
+                            <div class="row g-3 align-items-end">
+                                <div class="col-md-8">
+                                    <label for="target_lang" class="form-label fw-bold">Язык перевода</label>
+                                    <select name="target_lang" id="target_lang" class="form-select">
+                                        <option value="ru">Русский</option>
+                                        <option value="en">Английский</option>
+                                        <option value="es">Испанский</option>
+                                        <option value="fr">Французский</option>
+                                        <option value="de">Немецкий</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <button type="submit" class="btn btn-primary w-100 py-2">
+                                        <i class="bi bi-translate"></i> Перевести
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+
+                        {% if translation_result %}
+                        <div class="translation-result">
+                            <h5><i class="bi bi-check-circle-fill text-success me-2"></i> Исходный текст:</h5>
+                            <p>{{ original_text }}</p>
+
+                            <hr />
+
+                            <h5><i class="bi bi-check-circle-fill text-success me-2"></i> Перевод текста:</h5>
+                            <p>{{ translation_result }}</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
