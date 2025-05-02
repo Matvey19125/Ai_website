@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect, url_for, request, jsonify, flash
+from flask import Flask, render_template, redirect, url_for, request, jsonify, flash, make_response
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, current_user, login_required
 from flask_wtf import FlaskForm
@@ -26,7 +26,7 @@ app.config['SECRET_KEY'] = 'negt7821-Igoryan'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///password.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['UPLOAD_FOLDER'] = 'static/uploads'
-app.config['MAX_CONTENT_LENGTH'] = 50 * 1024 * 1024  # 50MB limit
+app.config['MAX_CONTENT_LENGTH'] = 50 * 1024 * 1024
 ALLOWED_EXTENSIONS = {'mp3', 'wav', 'ogg', 'm4a', 'flac'}
 db = SQLAlchemy(app)
 login_manager = LoginManager(app)
@@ -100,6 +100,7 @@ def output():
 @app.route("/chat", methods=['GET', 'POST'])
 @login_required
 def chat_page():
+    theme = request.cookies.get('theme', 'light')
     if request.method == 'POST':
         user_input = request.form.get('user_input')
         if user_input:
@@ -108,10 +109,10 @@ def chat_page():
                     model="gpt-4",
                     messages=[{"role": "user", "content": user_input}]
                 )
-                return render_template('chat.html', response=response, user_input=user_input)
+                return render_template('chat.html', theme=theme, response=response, user_input=user_input)
             except Exception as e:
-                return render_template('chat.html', error=str(e))
-    return render_template('chat.html')
+                return render_template('chat.html', theme=theme, error=str(e))
+    return render_template('chat.html', theme=theme)
 
 
 @app.route('/create_project', methods=['POST'])
@@ -128,34 +129,44 @@ def create_project():
         flash('Проект с таким именем уже существует', 'error')
         return redirect(url_for('run_code'))
     os.makedirs(project_folder)
-    with open(os.path.join(project_folder, 'main.py'), 'w', encoding='utf-8') as f:
-        f.write('''# Ваш код Python
+    save_code_to_file(os.path.join(project_folder, 'main.py'), '''# Ваш код Python
 print("Привет, мир!")''')
     flash(f'Проект "{project_name}" успешно создан', 'success')
     return redirect(url_for('run_code'))
 
 
+def save_code_to_file(filepath, code):
+    lines = [line.rstrip() for line in code.splitlines()]
+    while lines and not lines[-1]:
+        lines.pop()
+    with open(filepath, 'w', encoding='utf-8') as f:
+        f.write('\n'.join(lines))
+        f.write('\n')
+
+
 @app.route('/save_project/<project_name>', methods=['POST'])
 @login_required
 def save_project(project_name):
-    code = request.form.get('code', '').rstrip()
+    theme = request.cookies.get('theme', 'light')
+    code = request.form.get('code', '')
     user_folder = os.path.join(app.config['PROJECTS_FOLDER'], str(current_user.id))
     project_folder = os.path.join(user_folder, secure_filename(project_name))
     if not os.path.exists(project_folder):
         flash('Проект не найден', 'error')
         return redirect(url_for('run_code'))
+
     try:
-        with open(os.path.join(project_folder, 'main.py'), 'w', encoding='utf-8') as f:
-            f.write(code)
+        save_code_to_file(os.path.join(project_folder, 'main.py'), code)
         flash('Проект успешно сохранен', 'success')
     except Exception as e:
         flash(f'Ошибка при сохранении проекта: {str(e)}', 'error')
-    return redirect(url_for('load_project', project_name=project_name))
+    return redirect(url_for('load_project', project_name=project_name, theme=theme))
 
 
 @app.route('/load_project/<project_name>')
 @login_required
 def load_project(project_name):
+    theme = request.cookies.get('theme', 'light')
     user_folder = os.path.join(app.config['PROJECTS_FOLDER'], str(current_user.id))
     project_folder = os.path.join(user_folder, secure_filename(project_name))
     if not os.path.exists(project_folder):
@@ -164,11 +175,15 @@ def load_project(project_name):
     main_file = os.path.join(project_folder, 'main.py')
     if os.path.exists(main_file):
         with open(main_file, 'r', encoding='utf-8') as f:
-            code = f.read().rstrip() + "\n"
+            lines = f.readlines()
+            while lines and lines[-1].strip() == '':
+                lines.pop()
+            code = ''.join(lines) + '\n'
     else:
-        code = '# Файл main.py не найден'
+        code = '# Файл main.py не найден\n'
 
     return render_template('comp.html',
+                           theme=theme,
                            code=code,
                            project_name=project_name,
                            projects=get_user_projects(current_user.id))
@@ -185,9 +200,9 @@ def get_user_projects(user_id):
 @app.route('/python', methods=['GET', 'POST'])
 @login_required
 def run_code():
+    theme = request.cookies.get('theme', 'light')
     if request.method == 'POST':
-        code = request.form.get('code', '')
-        code = code.rstrip()
+        code = request.form.get('code', '').rstrip()
         user_input = request.form.get('input', '')
         project_name = request.form.get('project_name', '')
         output = ""
@@ -198,10 +213,7 @@ def run_code():
 
             if os.path.exists(project_folder):
                 try:
-                    with open(os.path.join(project_folder, 'main.py'), 'w', encoding='utf-8') as f:
-                        f.write(code)
-                        # Добавляем один перенос строки в конце файла
-                        f.write('\n')
+                    save_code_to_file(os.path.join(project_folder, 'main.py'), code)
                 except Exception as e:
                     flash(f'Ошибка при сохранении проекта: {str(e)}', 'error')
         try:
@@ -232,12 +244,14 @@ def run_code():
                 os.remove('temp_input.txt')
         return render_template('comp.html',
                                code=code,
+                               theme=theme,
                                user_input=user_input,
                                output=output,
                                error=error,
                                project_name=project_name,
                                projects=get_user_projects(current_user.id))
     return render_template('comp.html',
+                           theme=theme,
                            code='''# Пример кода
 a = int(input())
 b = int(input())
@@ -249,6 +263,7 @@ print(a + b)''',
 @app.route('/delete_project/<project_name>', methods=['POST'])
 @login_required
 def delete_project(project_name):
+    theme = request.cookies.get('theme', 'light')
     user_folder = os.path.join(app.config['PROJECTS_FOLDER'], str(current_user.id))
     project_folder = os.path.join(user_folder, secure_filename(project_name))
 
@@ -259,8 +274,10 @@ def delete_project(project_name):
         flash('Проект не найден', 'error')
     return redirect(url_for('run_code'))
 
+
 @app.route('/translate', methods=['GET', 'POST'])
 def translate_text():
+    theme = request.cookies.get('theme', 'light')
     if request.method == 'POST':
         text_to_translate = request.form['text'].strip()
         target_language = request.form.get('target_lang')
@@ -277,20 +294,36 @@ def translate_text():
         return render_template(
             'translator.html',
             original_text=text_to_translate,
+            theme=theme,
             translation_result=translated_text
         )
     else:
-        return render_template('translator.html')
+        return render_template('translator.html', theme=theme)
 
 
-@app.route('/menu', methods=['GET', 'POST'])
+@app.route('/menu')
 def menu():
-    return render_template("menu.html")
+    theme = request.cookies.get('theme', 'light')
+    return render_template("menu.html", theme=theme)
+
+@app.route('/set_theme', methods=['POST'])
+def set_theme():
+    theme = request.form.get('theme', 'light')
+    resp = make_response(redirect(url_for('menu')))
+    resp.set_cookie('theme', theme, max_age=30*24*60*60)
+    return resp
+
+@app.route('/logout')
+def logout():
+    resp = make_response(redirect('/'))
+    resp.set_cookie('theme', '', expires=0)
+    return resp
 
 
 @app.route('/music', methods=['GET', 'POST'])
 @login_required
 def music():
+    theme = request.cookies.get('theme', 'light')
     if request.method == 'POST':
         if 'musicFiles[]' not in request.files:
             flash('No file part', 'error')
@@ -318,7 +351,7 @@ def music():
     existing_files = []
     if os.path.exists(user_folder):
         existing_files = sorted(os.listdir(user_folder))
-    return render_template("music.html", existing_files=existing_files)
+    return render_template("music.html", theme=theme, existing_files=existing_files)
 
 
 @app.route('/delete_track', methods=['POST'])
@@ -341,14 +374,10 @@ def delete_track():
     return redirect(url_for('music'))
 
 
-@app.route("/razvil", methods=["GET", "POST"])
-def razvil():
-    return render_template("razvil.html")
-
-
 @app.route('/books', methods=['GET', 'POST'])
 @login_required
 def pdf_upload():
+    theme = request.cookies.get('theme', 'light')
     def allowed_file(filename):
         return '.' in filename and filename.rsplit('.', 1)[1].lower() == 'pdf'
     REQUIRED_BOOK = "Ваш первый учебник.pdf"
@@ -390,7 +419,7 @@ def pdf_upload():
     if os.path.exists(user_folder):
         existing_files = sorted([f for f in os.listdir(user_folder) if f.lower().endswith('.pdf')])
 
-    return render_template("document.html", existing_files=existing_files)
+    return render_template("document.html", theme=theme, existing_files=existing_files)
 
 
 @app.route('/delete_book/<filename>', methods=['POST'])

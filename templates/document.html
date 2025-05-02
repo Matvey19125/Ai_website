@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Моя библиотека | ПроКод</title>
+    <link rel="shortcut icon" href="/static/logo.ico">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
     <style>
@@ -16,13 +17,72 @@
             --card-bg: #ffffff;
             --text-main: #334155;
             --text-muted: #64748b;
+            --btn-text: #ffffff;
+            --border-color: #e2e8f0;
+        }
+
+        .dark-mode {
+            --primary: #3b82f6;
+            --secondary: #6366f1;
+            --accent: #818cf8;
+            --dark: #f8fafc;
+            --light-bg: #0f172a;
+            --card-bg: #1e293b;
+            --text-main: #ffffff;
+            --text-muted: #94a3b8;
+            --btn-text: #ffffff;
+            --border-color: #334155;
         }
 
         body {
             background-color: var(--light-bg);
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             color: var(--text-main);
-            padding-top: 2rem;
+            padding: 2rem 0;
+            position: relative;
+        }
+
+        h1, h2, h3, h4, h5, h6,
+        p, span, div,
+        .form-control, .form-label,
+        .ai-response, .quote-box,
+        .btn:not(.btn-primary):not(.back-link) {
+            color: var(--text-main) !important;
+        }
+
+        .btn-primary, .back-link {
+            color: var(--btn-text) !important;
+        }
+
+        .back-link {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border: none;
+            border-radius: 12px;
+            text-decoration: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 6px rgba(37, 99, 235, 0.2);
+        }
+
+        .back-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(37, 99, 235, 0.3);
+        }
+
+        .back-link:active {
+            transform: translateY(0);
+        }
+
+        .back-link i {
+            margin-right: 8px;
         }
 
         .library-container {
@@ -48,10 +108,8 @@
             color: var(--primary);
         }
 
-        h1 {
-            font-weight: 600;
-            color: var(--dark);
-            margin-bottom: 0.5rem;
+        .dark-mode .logo-icon {
+            background: linear-gradient(135deg, #1e3a8a, #1e40af);
         }
 
         .subtitle {
@@ -61,16 +119,19 @@
         }
 
         .quote-card {
-            background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+            background: linear-gradient(135deg, rgba(240, 249, 255, 0.5), rgba(224, 242, 254, 0.5));
             border-radius: 12px;
             padding: 1.5rem;
             margin-bottom: 2rem;
             border-left: 4px solid var(--primary);
         }
 
+        .dark-mode .quote-card {
+            background: linear-gradient(135deg, rgba(30, 58, 138, 0.2), rgba(30, 64, 175, 0.2));
+        }
+
         .quote-text {
             font-style: italic;
-            color: var(--dark);
             margin-bottom: 0.5rem;
         }
 
@@ -88,8 +149,12 @@
             box-shadow: 0 2px 10px rgba(15, 23, 42, 0.05);
         }
 
+        .dark-mode .upload-section {
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
         .upload-container {
-            border: 2px dashed #e2e8f0;
+            border: 2px dashed var(--border-color);
             padding: 1.5rem;
             text-align: center;
             border-radius: 8px;
@@ -98,11 +163,15 @@
 
         .upload-container:hover {
             border-color: var(--primary);
-            background-color: #f8fafc;
+            background-color: rgba(37, 99, 235, 0.05);
+        }
+
+        .dark-mode .upload-container:hover {
+            background-color: rgba(37, 99, 235, 0.1);
         }
 
         .btn-primary {
-            background-color: var(--primary);
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
             border: none;
             padding: 0.75rem 1.5rem;
             font-weight: 500;
@@ -111,8 +180,8 @@
         }
 
         .btn-primary:hover {
-            background-color: #1d4ed8;
             transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(37, 99, 235, 0.2);
         }
 
         .library-section {
@@ -120,6 +189,10 @@
             border-radius: 12px;
             padding: 1.5rem;
             box-shadow: 0 2px 10px rgba(15, 23, 42, 0.05);
+        }
+
+        .dark-mode .library-section {
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
         }
 
         .library-header {
@@ -131,7 +204,7 @@
 
         .books-count {
             background-color: var(--primary);
-            color: white;
+            color: white !important;
             padding: 0.25rem 0.75rem;
             border-radius: 20px;
             font-size: 0.9rem;
@@ -145,7 +218,7 @@
         }
 
         .book-card {
-            background: #f8fafc;
+            background: var(--light-bg);
             border-radius: 8px;
             padding: 1rem;
             transition: all 0.2s;
@@ -154,9 +227,8 @@
         }
 
         .book-card:hover {
-            background: #f1f5f9;
             transform: translateY(-2px);
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
 
         .book-cover {
@@ -172,9 +244,12 @@
             font-size: 2.5rem;
         }
 
+        .dark-mode .book-cover {
+            background: linear-gradient(135deg, #1e3a8a, #1e40af);
+        }
+
         .book-title {
             font-weight: 500;
-            color: var(--dark);
             margin-bottom: 0.5rem;
             white-space: nowrap;
             overflow: hidden;
@@ -197,22 +272,22 @@
 
         .view-btn {
             background-color: var(--primary);
-            color: white;
+            color: var(--btn-text);
         }
 
         .view-btn:hover {
             background-color: #1d4ed8;
-            color: white;
+            color: var(--btn-text);
         }
 
         .download-btn {
-            background-color: #e2e8f0;
-            color: var(--dark);
+            background-color: var(--border-color);
+            color: var(--text-main);
         }
 
         .download-btn:hover {
-            background-color: #cbd5e1;
-            color: var(--dark);
+            background-color: var(--text-muted);
+            color: var(--text-main);
         }
 
         .pdf-viewer-container {
@@ -258,27 +333,55 @@
         .empty-state-icon {
             font-size: 3rem;
             margin-bottom: 1rem;
-            color: #cbd5e1;
+            color: var(--border-color);
         }
 
-        .logout-link {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            color: var(--accent);
-            font-weight: 500;
-            text-decoration: none;
+        .form-control {
+            background-color: var(--card-bg);
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            transition: border-color 0.2s;
         }
 
-        .logout-link:hover {
-            color: #1d4ed8;
-            text-decoration: underline;
+        .form-control:focus {
+            background-color: var(--card-bg);
+            color: var(--text-main);
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .dark-mode .form-control:focus {
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
+        }
+
+        .dark-mode ::placeholder {
+            color: var(--text-muted) !important;
+            opacity: 1;
+        }
+
+        .dark-mode :-ms-input-placeholder {
+            color: var(--text-muted) !important;
+        }
+
+        .dark-mode ::-ms-input-placeholder {
+            color: var(--text-muted) !important;
+        }
+
+        @media (max-width: 576px) {
+            .back-link {
+                top: 1rem;
+                right: 1rem;
+                padding: 0.6rem 1.2rem;
+                font-size: 0.9rem;
+            }
         }
     </style>
 </head>
-<body>
-    <a href="/menu" class="logout-link">
-       <i class="bi bi-box-arrow-left"></i> Назад в меню
+<body class="{{ 'dark-mode' if theme == 'dark' else '' }}">
+    <a href="/menu" class="back-link">
+        <i class="bi bi-box-arrow-left"></i> Назад
     </a>
 
     <div class="container library-container">
@@ -302,7 +405,7 @@
                     <label for="fileInput" class="d-block mb-3">
                         <i class="bi bi-cloud-arrow-up" style="font-size: 2.5rem; color: var(--text-muted); margin-bottom: 1rem;"></i>
                         <h5>Нажмите для выбора PDF-файл</h5>
-                        <p class="text-muted">Поддерживаемый формат: PDF</p>
+                        <p style="color: var(--text-muted)">Поддерживаемый формат: PDF</p>
                     </label>
                     <button type="submit" class="btn btn-primary">Загрузить выбранные файлы</button>
                 </div>

@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Python Компилятор | ПроКод</title>
+    <link rel="shortcut icon" href="/static/logo.ico">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
     <style>
@@ -16,6 +17,25 @@
             --card-bg: #ffffff;
             --text-main: #334155;
             --text-muted: #64748b;
+            --btn-text: #ffffff;
+            --border-color: #e2e8f0;
+            --code-bg: #f8f9fa;
+            --input-bg: #ffffff;
+        }
+
+        .dark-mode {
+            --primary: #3b82f6;
+            --secondary: #6366f1;
+            --accent: #818cf8;
+            --dark: #f8fafc;
+            --light-bg: #0f172a;
+            --card-bg: #1e293b;
+            --text-main: #e2e8f0;
+            --text-muted: #94a3b8;
+            --btn-text: #ffffff;
+            --border-color: #334155;
+            --code-bg: #1e293b;
+            --input-bg: #1e293b;
         }
 
         body {
@@ -25,6 +45,68 @@
             padding: 2rem 0;
         }
 
+        .back-link {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border: none;
+            border-radius: 12px;
+            color: var(--btn-text) !important;
+            text-decoration: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 6px rgba(37, 99, 235, 0.2);
+        }
+
+        .back-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(37, 99, 235, 0.3);
+            color: var(--btn-text) !important;
+        }
+
+        .back-link:active {
+            transform: translateY(0);
+        }
+
+        .back-link i {
+            margin-right: 8px;
+        }
+
+        @media (max-width: 576px) {
+            .back-link {
+                top: 1rem;
+                right: 1rem;
+                padding: 0.6rem 1.2rem;
+                font-size: 0.9rem;
+            }
+        }
+        .form-control, .code-editor {
+            background-color: var(--input-bg) !important;
+            color: var(--text-main) !important;
+            border-color: var(--border-color) !important;
+        }
+
+        .dark-mode ::placeholder {
+            color: var(--text-muted) !important;
+            opacity: 1;
+        }
+
+        .dark-mode :-ms-input-placeholder {
+            color: var(--text-muted) !important;
+        }
+
+        .dark-mode ::-ms-input-placeholder {
+            color: var(--text-muted) !important;
+        }
+        h1, h2, h3, h4, h5, h6 {
+        color: var(--text-main);
+        }
         .compiler-card {
             border: none;
             border-radius: 14px;
@@ -40,10 +122,11 @@
             font-weight: 500;
             border-radius: 8px;
             transition: all 0.2s;
+            color: var(--btn-text);
         }
 
         .btn-primary:hover {
-            background-color: #1d4ed8;
+            background-color: var(--secondary);
             transform: translateY(-1px);
         }
 
@@ -55,19 +138,21 @@
         .code-editor {
             font-family: 'Courier New', monospace;
             font-size: 14px;
-            background-color: #f8f9fa;
-            border: 1px solid #e2e8f0;
+            background-color: var(--code-bg);
+            border: 1px solid var(--border-color);
             border-radius: 8px;
             padding: 1rem;
+            color: var(--text-main);
         }
 
         .output-area {
-            background-color: #f8f9fa;
+            background-color: var(--code-bg);
             border-radius: 8px;
             padding: 1rem;
             border-left: 4px solid var(--primary);
             white-space: pre-wrap;
             font-family: 'Courier New', monospace;
+            color: var(--text-main);
         }
 
         .error-area {
@@ -91,30 +176,130 @@
             border-radius: 0 8px 8px 0;
         }
 
-        .logout-link {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            color: var(--accent);
+        .dark-mode .quote {
+            background-color: rgba(37, 99, 235, 0.15);
+        }
+
+
+        .project-tabs {
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 1.5rem;
+        }
+
+        .project-tabs .nav-link {
+            color: var(--text-muted);
             font-weight: 500;
-            text-decoration: none;
+            border: none;
+            padding: 0.75rem 1.25rem;
+            margin-right: 0.5rem;
         }
 
-        .logout-link:hover {
-            color: #1d4ed8;
-            text-decoration: underline;
+        .project-tabs .nav-link.active {
+            color: var(--primary);
+            background-color: transparent;
+            border-bottom: 2px solid var(--primary);
         }
 
-        .project-list {
-            max-height: 300px;
-            overflow-y: auto;
+        .project-tabs .nav-link:hover {
+            color: var(--primary);
         }
+
+        .project-card {
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            transition: all 0.2s;
+            margin-bottom: 1rem;
+            background-color: var(--card-bg);
+        }
+
+        .project-card:hover {
+            border-color: var(--primary);
+            box-shadow: 0 2px 10px rgba(37, 99, 235, 0.1);
+        }
+
+        .project-card .card-body {
+            padding: 1rem;
+        }
+
+        .project-actions {
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .project-card:hover .project-actions {
+            opacity: 1;
+        }
+
+        .project-name {
+            font-weight: 500;
+            color: var(--text-main);
+        }
+
+        .project-empty {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-muted);
+        }
+
+        .project-empty-icon {
+            font-size: 3rem;
+            color: var(--border-color);
+            margin-bottom: 1rem;
+        }
+
+        .alert-info {
+            background-color: rgba(13, 110, 253, 0.1);
+            border-color: rgba(13, 110, 253, 0.2);
+            color: var(--text-main);
+        }
+
+        .dark-mode .alert-info {
+            background-color: rgba(13, 110, 253, 0.2);
+        }
+        card, .compiler-card, .project-card {
+        color: var(--text-main);
+        }
+        .form-label, .form-control, .code-editor {
+        color: var(--text-main);
+    }
+
+    .output-area, .error-area {
+        color: var(--text-main);
+    }
+
+    .quote, .text-muted {
+        color: var(--text-muted);
+    }
+
+    .btn-primary, .btn-outline-primary, .btn-outline-danger {
+        color: var(--btn-text);
+    }
+
+    .btn-outline-primary {
+        color: var(--primary);
+    }
+    .btn-outline-danger {
+        color: #dc3545;
+    }
+
+    .dark-mode .bi {
+        color: var(--text-main);
+    }
+    a {
+        color: var(--accent);
+    }
+    a:hover {
+        color: var(--primary);
+    }
+
+}
     </style>
 </head>
-<body>
-    <a href="/menu" class="logout-link">
-        <i class="bi bi-box-arrow-right"></i> Назад в меню
+<body class="{{ 'dark-mode' if theme == 'dark' else '' }}">
+    <a href="/menu" class="back-link">
+        <i class="bi bi-box-arrow-left"></i> Назад
     </a>
+
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-lg-10">
@@ -131,56 +316,31 @@
                         </div>
                     </div>
                 </div>
-                <div class="row">
-                    <div class="col-md-4">
-                        <div class="card compiler-card mb-4">
-                            <div class="card-body">
-                                <h5 class="mb-3"><i class="bi bi-folder-plus"></i> Управление проектами</h5>
-                                <form method="POST" action="/create_project" class="mb-4">
-                                    <div class="input-group mb-3">
-                                        <input type="text" class="form-control" name="project_name" placeholder="Название проекта" required>
-                                        <button type="submit" class="btn btn-primary">
-                                            <i class="bi bi-plus-circle"></i> Создать
-                                        </button>
-                                    </div>
-                                </form>
-                                {% if projects %}
-                                <h5 class="mb-3"><i class="bi bi-collection"></i> Мои проекты</h5>
-                                <div class="project-list">
-                                    <div class="list-group">
-                                        {% for project in projects %}
-                                        <div class="list-group-item d-flex justify-content-between align-items-center">
-                                            <a href="/load_project/{{ project }}" class="text-decoration-none flex-grow-1">
-                                                <i class="bi bi-folder me-2"></i>{{ project }}
-                                            </a>
-                                            <form method="POST" action="/delete_project/{{ project }}" class="ms-2">
-                                                <button type="submit" class="btn btn-sm btn-outline-danger">
-                                                    <i class="bi bi-trash"></i>
-                                                </button>
-                                            </form>
-                                        </div>
-                                        {% endfor %}
-                                    </div>
-                                </div>
-                                {% else %}
-                                <div class="alert alert-info">
-                                    <i class="bi bi-info-circle"></i> У вас пока нет проектов. Создайте свой первый проект!
-                                </div>
-                                {% endif %}
-                            </div>
-                        </div>
-                    </div>
 
-                    <div class="col-md-8">
-                        <div class="card compiler-card mb-4">
-                            <div class="card-body">
+                <div class="card compiler-card mb-4">
+                    <div class="card-body">
+                        <ul class="nav project-tabs">
+                            <li class="nav-item">
+                                <a class="nav-link active" data-bs-toggle="tab" href="#editor-tab">
+                                    <i class="bi bi-code-square"></i> Редактор кода
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" data-bs-toggle="tab" href="#projects-tab">
+                                    <i class="bi bi-folder"></i> Мои проекты
+                                </a>
+                            </li>
+                        </ul>
+
+                        <div class="tab-content">
+                            <div class="tab-pane fade show active" id="editor-tab">
                                 {% if project_name %}
                                 <div class="alert alert-info mb-3">
                                     <i class="bi bi-info-circle"></i> Вы редактируете проект: <strong>{{ project_name }}</strong>
                                 </div>
                                 {% endif %}
 
-                                <form method="POST" action="/python">
+                                <form method="POST" action="/python?theme={{ theme }}">
                                     {% if project_name %}
                                     <input type="hidden" name="project_name" value="{{ project_name }}">
                                     {% endif %}
@@ -199,41 +359,93 @@ print(a + b){% endif %}</textarea>
 20{% endif %}</textarea>
                                     </div>
 
-                                    <div class="d-flex justify-content-between">
-                                        {% if project_name %}
-                                        <button type="submit" name="action" value="save" class="btn btn-outline-primary">
-                                            <i class="bi bi-save"></i> Сохранить проект
-                                        </button>
-                                        {% endif %}
-                                        <button type="submit" name="action" value="run" class="btn btn-primary ms-auto">
+                                    <div class="d-flex justify-content-end">
+                                        <button type="submit" class="btn btn-primary">
                                             <i class="bi bi-play-fill"></i> Запустить код
                                         </button>
                                     </div>
                                 </form>
-                            </div>
-                        </div>
 
-                        {% if output %}
-                        <div class="card compiler-card mb-4">
-                            <div class="card-body">
-                                <h5 class="mb-3"><i class="bi bi-check-circle-fill text-success me-2"></i>Результат выполнения</h5>
-                                <div class="output-area">{{ output }}</div>
-                            </div>
-                        </div>
-                        {% endif %}
+                                {% if output %}
+                                <div class="mt-4">
+                                    <h5 class="mb-3"><i class="bi bi-check-circle-fill text-success me-2"></i>Результат выполнения</h5>
+                                    <div class="output-area">{{ output }}</div>
+                                </div>
+                                {% endif %}
 
-                        {% if error %}
-                        <div class="card compiler-card mb-4">
-                            <div class="card-body">
-                                <h5 class="mb-3"><i class="bi bi-exclamation-triangle-fill text-danger me-2"></i>Ошибка выполнения</h5>
-                                <div class="output-area error-area">{{ error }}</div>
+                                {% if error %}
+                                <div class="mt-4">
+                                    <h5 class="mb-3"><i class="bi bi-exclamation-triangle-fill text-danger me-2"></i>Ошибка выполнения</h5>
+                                    <div class="output-area error-area">{{ error }}</div>
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            <div class="tab-pane fade" id="projects-tab">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="card compiler-card">
+                                            <div class="card-body">
+                                                <h5 class="mb-3"><i class="bi bi-plus-circle"></i> Создать новый проект</h5>
+                                                <form method="POST" action="/create_project?theme={{ theme }}">
+                                                    <div class="input-group mb-3">
+                                                        <input type="text" class="form-control" name="project_name" placeholder="Название проекта" required>
+                                                        <button type="submit" class="btn btn-primary">
+                                                            Создать
+                                                        </button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="mt-4">
+                                    <h5 class="mb-3"><i class="bi bi-collection"></i> Мои проекты</h5>
+
+                                    {% if projects %}
+                                    <div class="row">
+                                        {% for project in projects %}
+                                        <div class="col-md-6">
+                                            <div class="project-card">
+                                                <div class="card-body d-flex justify-content-between align-items-center">
+                                                    <div>
+                                                        <i class="bi bi-folder text-primary me-2"></i>
+                                                        <span class="project-name">{{ project }}</span>
+                                                    </div>
+                                                    <div class="project-actions">
+                                                        <a href="/load_project/{{ project }}?theme={{ theme }}" class="btn btn-sm btn-outline-primary me-1" title="Открыть">
+                                                            <i class="bi bi-folder2-open"></i>
+                                                        </a>
+                                                        <form method="POST" action="/delete_project/{{ project }}?theme={{ theme }}" class="d-inline">
+                                                            <button type="submit" class="btn btn-sm btn-outline-danger" title="Удалить">
+                                                                <i class="bi bi-trash"></i>
+                                                            </button>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                    {% else %}
+                                    <div class="project-empty">
+                                        <div class="project-empty-icon">
+                                            <i class="bi bi-folder-x"></i>
+                                        </div>
+                                        <h5>Нет созданных проектов</h5>
+                                        <p class="text-muted">Создайте свой первый проект, чтобы сохранять код</p>
+                                    </div>
+                                    {% endif %}
+                                </div>
                             </div>
                         </div>
-                        {% endif %}
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

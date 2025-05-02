@@ -4,7 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Чат с ИИ | ПроКод</title>
+    <link rel="shortcut icon" href="/static/logo.ico">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
     <style>
         :root {
             --primary: #2563eb;
@@ -15,12 +17,72 @@
             --card-bg: #ffffff;
             --text-main: #334155;
             --text-muted: #64748b;
+            --btn-text: #ffffff;
+            --border-color: #e2e8f0;
+        }
+
+        .dark-mode {
+            --primary: #3b82f6;
+            --secondary: #6366f1;
+            --accent: #818cf8;
+            --dark: #f8fafc;
+            --light-bg: #0f172a;
+            --card-bg: #1e293b;
+            --text-main: #ffffff;
+            --text-muted: #94a3b8;
+            --btn-text: #ffffff;
+            --border-color: #334155;
         }
 
         body {
             background-color: var(--light-bg);
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             color: var(--text-main);
+            padding: 2rem 0;
+            position: relative;
+        }
+
+        h1, h2, h3, h4, h5, h6,
+        p, span, div,
+        .form-control, .form-label,
+        .ai-response, .quote-box,
+        .btn:not(.btn-primary):not(.back-link) {
+            color: var(--text-main) !important;
+        }
+
+        .btn-primary, .back-link {
+            color: var(--btn-text) !important;
+        }
+
+        .back-link {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border: none;
+            border-radius: 12px;
+            text-decoration: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 6px rgba(37, 99, 235, 0.2);
+        }
+
+        .back-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(37, 99, 235, 0.3);
+        }
+
+        .back-link:active {
+            transform: translateY(0);
+        }
+
+        .back-link i {
+            margin-right: 8px;
         }
 
         .chat-card {
@@ -29,18 +91,15 @@
             box-shadow: 0 4px 20px rgba(15, 23, 42, 0.05);
             background: var(--card-bg);
             overflow: hidden;
+            margin-bottom: 1.5rem;
         }
 
-        .card-header {
-            background: var(--card-bg);
-            color: var(--dark);
-            padding: 2rem 1.5rem 1rem;
-            text-align: center;
-            border-bottom: 1px solid rgba(226, 232, 240, 0.7);
+        .dark-mode .chat-card {
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
         }
 
         .btn-primary {
-            background-color: var(--primary);
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
             border: none;
             padding: 0.75rem;
             font-weight: 500;
@@ -49,20 +108,28 @@
         }
 
         .btn-primary:hover {
-            background-color: #1d4ed8;
             transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(37, 99, 235, 0.2);
         }
 
         .form-control {
-            border: 1px solid #e2e8f0;
+            background-color: var(--card-bg);
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
             border-radius: 8px;
             padding: 0.75rem 1rem;
             transition: border-color 0.2s;
         }
 
         .form-control:focus {
+            background-color: var(--card-bg);
+            color: var(--text-main);
             border-color: var(--primary);
             box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .dark-mode .form-control:focus {
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
         }
 
         .logo-icon {
@@ -77,16 +144,8 @@
             color: var(--primary);
         }
 
-        .link-accent {
-            color: var(--accent);
-            font-weight: 500;
-            text-decoration: none;
-            transition: color 0.2s;
-        }
-
-        .link-accent:hover {
-            color: #0d9488;
-            text-decoration: underline;
+        .dark-mode .logo-icon {
+            background: linear-gradient(135deg, #1e3a8a, #1e40af);
         }
 
         h3 {
@@ -96,29 +155,20 @@
         }
 
         .ai-response {
-            background-color: #f8f9fa;
+            background-color: rgba(37, 99, 235, 0.05);
             border-radius: 10px;
             padding: 1rem;
             margin-top: 1rem;
             border-left: 4px solid var(--primary);
         }
 
+        .dark-mode .ai-response {
+            background-color: rgba(37, 99, 235, 0.15);
+        }
+
         .user-message {
             font-weight: 500;
             color: var(--primary);
-        }
-
-        .logout-link {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            color: var(--accent);
-            font-weight: 500;
-            text-decoration: none;
-        }
-        .logout-link:hover {
-            color: #1d4ed8;
-            text-decoration: underline;
         }
 
         .quote-box {
@@ -132,12 +182,45 @@
             border-radius: 0 8px 8px 0;
             max-width: 600px;
         }
+
+        .dark-mode .quote-box {
+            background-color: rgba(37, 99, 235, 0.15);
+        }
+
+        .dark-mode ::placeholder {
+            color: var(--text-muted) !important;
+            opacity: 1;
+        }
+
+        .dark-mode :-ms-input-placeholder {
+            color: var(--text-muted) !important;
+        }
+
+        .dark-mode ::-ms-input-placeholder {
+            color: var(--text-muted) !important;
+        }
+
+        .assistant-text {
+            color: var(--text-muted);
+            font-size: 1rem;
+            margin-bottom: 0;
+        }
+
+        @media (max-width: 576px) {
+            .back-link {
+                top: 1rem;
+                right: 1rem;
+                padding: 0.6rem 1.2rem;
+                font-size: 0.9rem;
+            }
+        }
     </style>
 </head>
-<body>
-<a href="/menu" class="logout-link">
-            <i class="bi bi-box-arrow-left"></i> Назад в меню
-        </a>
+<body class="{{ 'dark-mode' if theme == 'dark' else '' }}">
+    <a href="/menu" class="back-link">
+        <i class="bi bi-box-arrow-left"></i> Назад
+    </a>
+
     <div class="container py-5">
         <div class="row justify-content-center mb-4">
             <div class="col-md-8 text-center">
@@ -146,8 +229,8 @@
                         <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>
                     </svg>
                 </div>
-                <h3 class="text-dark">Чат с ИИ</h3>
-                <p class="text-muted">Ваш помощник в обучении программированию</p>
+                <h3>Чат с ИИ</h3>
+                <p class="assistant-text">Ваш помощник в обучении программированию</p>
                 <div class="quote-box">
                     "Искусственный интеллект - это зеркало, отражающее человеческий разум. То, что мы видим в нём, говорит больше о нас самих, чем о самой технологии."<br>
                     <small>- Макс Тегмарк, физик и автор книги "Жизнь 3.0"</small>
@@ -157,12 +240,12 @@
 
         <div class="row justify-content-center">
             <div class="col-md-8">
-                <div class="card chat-card mb-4">
+                <div class="card chat-card">
                     <div class="card-body">
                         <form method="POST" action="/chat">
                             <div class="mb-3">
                                 <label for="user_input" class="form-label">Ваш запрос:</label>
-                                <textarea class="form-control" id="user_input" name="user_input" rows="4" required>{{ user_input or '' }}</textarea>
+                                <textarea class="form-control" id="user_input" name="user_input" rows="4" required placeholder="Введите ваш вопрос...">{{ user_input or '' }}</textarea>
                             </div>
                             <button type="submit" class="btn btn-primary w-100">Отправить</button>
                         </form>
@@ -175,7 +258,7 @@
                 {% if response %}
                     <div class="card chat-card">
                         <div class="card-body">
-                            <h5 class="card-title text-dark">Ответ ИИ</h5>
+                            <h5 class="card-title">Ответ ИИ</h5>
                             {% if user_input %}
                                 <p class="user-message mb-3">Вы: {{ user_input }}</p>
                             {% endif %}
