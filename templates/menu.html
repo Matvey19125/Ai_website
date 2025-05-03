@@ -57,7 +57,7 @@
             background: var(--card-bg);
             height: 100%;
             transition: all 0.3s ease;
-            padding: 2rem;
+            padding: 1.5rem;
             text-align: center;
             display: flex;
             flex-direction: column;
@@ -69,12 +69,12 @@
         }
 
         .btn-feature {
-            padding: 1.5rem;
-            font-size: 1.1rem;
+            padding: 0.75rem;
+            font-size: 1rem;
             font-weight: 500;
-            border-radius: 12px;
+            border-radius: 10px;
             width: 100%;
-            margin-top: auto;
+            margin-top: 1rem;
             background: linear-gradient(135deg, var(--primary), var(--secondary));
             border: none;
             color: var(--btn-text) !important;
@@ -123,7 +123,7 @@
         }
 
         .feature-icon {
-            font-size: 2.5rem;
+            font-size: 2rem;
             color: var(--primary);
             margin-bottom: 1rem;
         }
@@ -131,29 +131,20 @@
         .feature-title {
             font-weight: 600;
             color: var(--dark);
+            margin-bottom: 0.75rem;
+            font-size: 1.1rem;
+        }
+
+        .feature-description {
+            font-size: 0.9rem;
+            color: var(--text-muted);
             margin-bottom: 1rem;
-        }
-
-        .logout-link {
-            display: inline-block;
-            margin-top: 2rem;
-            color: var(--accent);
-            font-weight: 500;
-        }
-
-        .logout-link:hover {
-            color: var(--primary);
-            text-decoration: none;
         }
 
         .feature-content {
             flex: 1;
             display: flex;
             flex-direction: column;
-        }
-
-        .feature-description {
-            flex: 1;
         }
 
         .logout-btn {
@@ -282,77 +273,106 @@
                 <small>- Анонимный разработчик</small>
             </div>
         </div>
-        <div class="row g-4">
-            <div class="col-md-3">
+
+        <div class="row g-3">
+            <div class="col-md-3 col-6">
                 <div class="feature-card">
                     <div class="feature-content">
                         <div class="feature-icon">
                             <i class="bi bi-code-square"></i>
                         </div>
                         <h3 class="feature-title">Python Компилятор</h3>
-                        <p class="feature-description">Запускайте и тестируйте свой Python-код прямо в браузере</p>
+                        <p class="feature-description">Запускайте и тестируйте Python-код прямо в браузере</p>
                         <a href="/python?theme={{ request.args.get('theme', '') }}" class="btn btn-feature">
                             <i class="bi bi-play-fill"></i> Запустить
                         </a>
                     </div>
                 </div>
             </div>
-            <div class="col-md-3">
+            <div class="col-md-3 col-6">
                 <div class="feature-card">
                     <div class="feature-content">
                         <div class="feature-icon">
                             <i class="bi bi-robot"></i>
                         </div>
                         <h3 class="feature-title">Чат с ИИ</h3>
-                        <p class="feature-description">Получайте помощь в программировании от искусственного интеллекта</p>
+                        <p class="feature-description">Получайте помощь в программировании от ИИ</p>
                         <a href="/chat?theme={{ request.args.get('theme', '') }}" class="btn btn-feature">
                             <i class="bi bi-chat-dots"></i> Открыть чат
                         </a>
                     </div>
                 </div>
             </div>
-            <div class="col-md-3">
+            <div class="col-md-3 col-6">
+                <div class="feature-card">
+                    <div class="feature-content">
+                        <div class="feature-icon">
+                            <i class="bi bi-camera-reels"></i>
+                        </div>
+                        <h3 class="feature-title">Видео уроки</h3>
+                        <p class="feature-description"> Загружайте обучающие видео по программированию</p>
+                        <a href="/videos?theme={{ request.args.get('theme', '') }}" class="btn btn-feature">
+                            <i class="bi bi-play-circle"></i> Смотреть
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
                 <div class="feature-card">
                     <div class="feature-content">
                         <div class="feature-icon">
                             <i class="bi bi-translate"></i>
                         </div>
                         <h3 class="feature-title">Переводчик</h3>
-                        <p class="feature-description">Переводите техническую документацию и сообщения на разные языки</p>
+                        <p class="feature-description">Переводите техническую документацию</p>
                         <a href="/translate?theme={{ request.args.get('theme', '') }}" class="btn btn-feature">
                             <i class="bi bi-globe2"></i> Перевести
                         </a>
                     </div>
                 </div>
             </div>
-            <div class="col-md-3">
+            <div class="col-md-3 col-6">
                 <div class="feature-card">
                     <div class="feature-content">
                         <div class="feature-icon">
                             <i class="bi bi-book"></i>
                         </div>
                         <h3 class="feature-title">Учебники</h3>
-                        <p class="feature-description">Загрузите лучшие учебники и руководства по программированию</p>
+                        <p class="feature-description"> Загружайте и обучайтесь по лучшим учебникам по программированию</p>
                         <a href="/books?theme={{ request.args.get('theme', '') }}" class="btn btn-feature">
                             <i class="bi bi-journal-bookmark"></i> Изучать
                         </a>
                     </div>
                 </div>
             </div>
-            <div class="col-md-3">
+            <div class="col-md-3 col-6">
                 <div class="feature-card">
                     <div class="feature-content">
                         <div class="feature-icon">
                             <i class="bi bi-music-note-beamed"></i>
                         </div>
-                        <h3 class="feature-title">Музыка для релакса</h3>
-                        <p class="feature-description"> Загрузите расслабляющие мелодии для восстановления концентрации и отдыха</p>
+                        <h3 class="feature-title">Музыка</h3>
+                        <p class="feature-description"> Загружайте расслабляющие мелодии для работы и отдыха</p>
                         <a href="/music?theme={{ request.args.get('theme', '') }}" class="btn btn-feature">
                             <i class="bi bi-headphones"></i> Слушать
                         </a>
                     </div>
                 </div>
             </div>
+            <div class="col-md-3 col-6">
+    <div class="feature-card">
+        <div class="feature-content">
+            <div class="feature-icon">
+                <i class="bi bi-journal-text"></i>
+            </div>
+            <h3 class="feature-title">Заметки</h3>
+            <p class="feature-description">Создавайте и сохраняйте свои заметки по программированию</p>
+            <a href="/notes?theme={{ request.args.get('theme', '') }}" class="btn btn-feature">
+                <i class="bi bi-pencil-square"></i> Открыть
+            </a>
+        </div>
+    </div>
+</div>
         </div>
     </div>
 </body>

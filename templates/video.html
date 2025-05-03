@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Мои видеоуроки | ПроКод</title>
+    <link rel="shortcut icon" href="/static/logo.ico">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --secondary: #4f46e5;
+            --accent: #4f46e5;
+            --dark: #1e293b;
+            --light-bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #334155;
+            --text-muted: #64748b;
+            --btn-text: #ffffff;
+            --border-color: #e2e8f0;
+        }
+
+        .dark-mode {
+            --primary: #3b82f6;
+            --secondary: #6366f1;
+            --accent: #818cf8;
+            --dark: #f8fafc;
+            --light-bg: #0f172a;
+            --card-bg: #1e293b;
+            --text-main: #ffffff;
+            --text-muted: #94a3b8;
+            --btn-text: #ffffff;
+            --border-color: #334155;
+        }
+
+        body {
+            background-color: var(--light-bg);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            color: var(--text-main);
+            padding: 2rem 0;
+            position: relative;
+        }
+
+        h1, h2, h3, h4, h5, h6,
+        p, span, div,
+        .form-control, .form-label,
+        .ai-response, .quote-box,
+        .btn:not(.btn-primary):not(.back-link) {
+            color: var(--text-main) !important;
+        }
+
+        .btn-primary, .back-link {
+            color: var(--btn-text) !important;
+        }
+
+        .back-link {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border: none;
+            border-radius: 12px;
+            text-decoration: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 6px rgba(37, 99, 235, 0.2);
+        }
+
+        .back-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(37, 99, 235, 0.3);
+        }
+
+        .back-link:active {
+            transform: translateY(0);
+        }
+
+        .back-link i {
+            margin-right: 8px;
+        }
+
+        .videos-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        .header-section {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        .logo-icon {
+            width: 48px;
+            height: 48px;
+            margin: 0 auto 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+            border-radius: 12px;
+            color: var(--primary);
+        }
+
+        .dark-mode .logo-icon {
+            background: linear-gradient(135deg, #1e3a8a, #1e40af);
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .quote-card {
+            background: linear-gradient(135deg, rgba(240, 249, 255, 0.5), rgba(224, 242, 254, 0.5));
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            border-left: 4px solid var(--primary);
+        }
+
+        .dark-mode .quote-card {
+            background: linear-gradient(135deg, rgba(30, 58, 138, 0.2), rgba(30, 64, 175, 0.2));
+        }
+
+        .quote-text {
+            font-style: italic;
+            margin-bottom: 0.5rem;
+        }
+
+        .quote-author {
+            font-weight: 500;
+            color: var(--primary);
+            text-align: right;
+        }
+
+        .upload-section {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 10px rgba(15, 23, 42, 0.05);
+        }
+
+        .dark-mode .upload-section {
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .upload-container {
+            border: 2px dashed var(--border-color);
+            padding: 1.5rem;
+            text-align: center;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .upload-container:hover {
+            border-color: var(--primary);
+            background-color: rgba(37, 99, 235, 0.05);
+        }
+
+        .dark-mode .upload-container:hover {
+            background-color: rgba(37, 99, 235, 0.1);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border: none;
+            padding: 0.75rem 1.5rem;
+            font-weight: 500;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(37, 99, 235, 0.2);
+        }
+
+        .videos-section {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 10px rgba(15, 23, 42, 0.05);
+        }
+
+        .dark-mode .videos-section {
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .videos-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .videos-count {
+            background-color: var(--primary);
+            color: white !important;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .videos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .video-card {
+            background: var(--light-bg);
+            border-radius: 8px;
+            padding: 1rem;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .video-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .video-thumbnail {
+            width: 100%;
+            height: 140px;
+            background: linear-gradient(135deg, #e0f2fe, #bae6fd);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            border-radius: 4px;
+            font-size: 2.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .video-thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .play-icon {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+        }
+
+        .dark-mode .video-thumbnail {
+            background: linear-gradient(135deg, #1e3a8a, #1e40af);
+        }
+
+        .video-title {
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .video-actions {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .action-btn {
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            text-decoration: none;
+        }
+
+        .view-btn {
+            background-color: var(--primary);
+            color: var(--btn-text);
+        }
+
+        .view-btn:hover {
+            background-color: #1d4ed8;
+            color: var(--btn-text);
+        }
+
+        .download-btn {
+            background-color: var(--border-color);
+            color: var(--text-main);
+        }
+
+        .download-btn:hover {
+            background-color: var(--text-muted);
+            color: var(--text-main);
+        }
+
+        .video-player-container {
+            margin-top: 2rem;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .video-player {
+            width: 100%;
+            height: 500px;
+            background: var(--dark);
+        }
+
+        .close-player {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #ff4444;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            padding: 5px 10px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 14px;
+            z-index: 10;
+        }
+
+        .close-player:hover {
+            background: #cc0000;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem 0;
+            color: var(--text-muted);
+            grid-column: 1 / -1;
+        }
+
+        .empty-state-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: var(--border-color);
+        }
+
+        .form-control {
+            background-color: var(--card-bg);
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            transition: border-color 0.2s;
+        }
+
+        .form-control:focus {
+            background-color: var(--card-bg);
+            color: var(--text-main);
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .dark-mode .form-control:focus {
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
+        }
+
+        .dark-mode ::placeholder {
+            color: var(--text-muted) !important;
+            opacity: 1;
+        }
+
+        .dark-mode :-ms-input-placeholder {
+            color: var(--text-muted) !important;
+        }
+
+        .dark-mode ::-ms-input-placeholder {
+            color: var(--text-muted) !important;
+        }
+
+        @media (max-width: 576px) {
+            .back-link {
+                top: 1rem;
+                right: 1rem;
+                padding: 0.6rem 1.2rem;
+                font-size: 0.9rem;
+            }
+
+            .videos-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .video-player {
+                height: 300px;
+            }
+        }
+    </style>
+</head>
+<body class="{{ 'dark-mode' if theme == 'dark' else '' }}">
+    <a href="/menu" class="back-link">
+        <i class="bi bi-box-arrow-left"></i> Назад
+    </a>
+
+    <div class="container videos-container">
+        <div class="header-section">
+            <div class="logo-icon">
+                <i class="bi bi-play-circle"></i>
+            </div>
+            <h1>Мои видеоуроки</h1>
+            <p class="subtitle">Ваша коллекция обучающих видео</p>
+        </div>
+
+        <div class="quote-card">
+            <p class="quote-text">"Видео — это мощный инструмент обучения, который позволяет увидеть процесс в действии и понять то, что сложно объяснить словами."</p>
+            <p class="quote-author">— Стив Джобс</p>
+        </div>
+
+        <div class="upload-section">
+            <h3 class="mb-3">Добавить новые видео</h3>
+            <form method="post" enctype="multipart/form-data">
+                <div class="upload-container">
+                    <input type="file" name="videoFiles[]" accept="video/*" multiple style="display: none;" id="fileInput">
+                    <label for="fileInput" class="d-block mb-3">
+                        <i class="bi bi-cloud-arrow-up" style="font-size: 2.5rem; color: var(--text-muted); margin-bottom: 1rem;"></i>
+                        <h5>Нажмите для выбора видеофайлов</h5>
+                        <p style="color: var(--text-muted)">Поддерживаемые форматы: MP4, AVI, MOV, MKV, WEBM</p>
+                    </label>
+                    <button type="submit" class="btn btn-primary">Загрузить выбранные файлы</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="videos-section">
+            <div class="videos-header">
+                <h3>Мои видео</h3>
+                <span class="videos-count">{{ existing_videos|length }}</span>
+            </div>
+
+            {% if existing_videos %}
+                <div class="videos-grid">
+                    {% for video in existing_videos %}
+                        <div class="video-card">
+                            <div class="video-thumbnail">
+                                <i class="bi bi-play-btn"></i>
+                                <div class="play-icon">
+                                    <i class="bi bi-play-fill"></i>
+                                </div>
+                            </div>
+                            <h5 class="video-title">{{ video.filename }}</h5>
+                            <div class="video-actions">
+                                {% if view_video == video.filename %}
+                                    <a href="{{ url_for('video') }}" class="action-btn view-btn">Закрыть</a>
+                                {% else %}
+                                    <a href="{{ url_for('video') }}?view={{ video.filename }}" class="action-btn view-btn">Смотреть</a>
+                                {% endif %}
+                                <a href="{{ url_for('static', filename='uploads/videos/' + current_user.id|string + '/' + video.filename) }}" download class="action-btn download-btn">Скачать</a>
+                                <form action="{{ url_for('delete_video', filename=video.filename) }}" method="post" style="display: inline;">
+                                    <button type="submit" class="action-btn btn btn-danger">Удалить</button>
+                                </form>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    <div class="empty-state-icon">
+                        <i class="bi bi-camera-video"></i>
+                    </div>
+                    <h4>Ваша видеотека пуста</h4>
+                    <p>Загрузите свои первые видеоуроки, чтобы начать обучение</p>
+                </div>
+            {% endif %}
+
+            {% if view_video %}
+                <div class="video-player-container">
+                    <video controls class="video-player">
+                        <source src="{{ url_for('static', filename='uploads/videos/' + current_user.id|string + '/' + view_video) }}" type="video/mp4">
+                        Ваш браузер не поддерживает видео тег.
+                    </video>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

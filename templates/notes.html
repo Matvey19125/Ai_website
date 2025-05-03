@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Заметки | ПроКод</title>
+    <link rel="shortcut icon" href="/static/logo.ico">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --secondary: #4f46e5;
+            --accent: #4f46e5;
+            --dark: #1e293b;
+            --light-bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #334155;
+            --text-muted: #64748b;
+            --btn-text: #ffffff;
+            --border-color: #e2e8f0;
+        }
+
+        .dark-mode {
+            --primary: #3b82f6;
+            --secondary: #6366f1;
+            --accent: #818cf8;
+            --dark: #f8fafc;
+            --light-bg: #0f172a;
+            --card-bg: #1e293b;
+            --text-main: #e2e8f0;
+            --text-muted: #94a3b8;
+            --btn-text: #ffffff;
+            --border-color: #334155;
+        }
+
+        body {
+            background-color: var(--light-bg);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            color: var(--text-main);
+            padding: 2rem 0;
+            position: relative;
+        }
+
+        h1, h2, h3, h4, h5, h6,
+        p, span, div,
+        .form-control, .form-select, .form-label,
+        .notes-list, .quote,
+        .btn:not(.btn-primary):not(.back-link) {
+            color: var(--text-main) !important;
+        }
+
+        .btn-primary, .back-link {
+            color: var(--btn-text) !important;
+        }
+
+        .notes-card {
+            border: none;
+            border-radius: 14px;
+            box-shadow: 0 4px 20px rgba(15, 23, 42, 0.05);
+            background: var(--card-bg);
+            margin-bottom: 2rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border: none;
+            padding: 0.75rem;
+            font-weight: 500;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(37, 99, 235, 0.2);
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .note-item {
+            background-color: rgba(37, 99, 235, 0.05);
+            border-radius: 8px;
+            padding: 1rem;
+            border-left: 4px solid var(--primary);
+            margin-bottom: 1rem;
+            transition: all 0.2s;
+        }
+
+        .note-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(37, 99, 235, 0.1);
+        }
+
+        .dark-mode .note-item {
+            background-color: rgba(37, 99, 235, 0.15);
+        }
+
+        .dark-mode .form-control,
+        .dark-mode .form-select,
+        .dark-mode .form-select option {
+            background-color: var(--card-bg);
+            color: var(--text-main) !important;
+            border-color: var(--text-muted);
+        }
+
+        .dark-mode .form-control:focus,
+        .dark-mode .form-select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
+        }
+
+        .header-icon {
+            color: var(--primary);
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .quote {
+            font-style: italic;
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            margin: 1.5rem 0;
+            padding: 1rem;
+            border-left: 4px solid var(--primary);
+            background-color: rgba(37, 99, 235, 0.05);
+            border-radius: 0 8px 8px 0;
+        }
+
+        .dark-mode .quote {
+            background-color: rgba(37, 99, 235, 0.15);
+        }
+
+        .back-link {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border: none;
+            border-radius: 12px;
+            text-decoration: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 6px rgba(37, 99, 235, 0.2);
+        }
+
+        .back-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(37, 99, 235, 0.3);
+        }
+
+        .back-link:active {
+            transform: translateY(0);
+        }
+
+        .back-link i {
+            margin-right: 8px;
+        }
+
+        .theme-switcher {
+        position: absolute;
+        top: 0;
+        left: 0;
+        opacity: 0;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        }
+
+        .theme-btn {
+            display: none;
+        }
+
+        .theme-btn:hover {
+            background-color: var(--primary);
+            color: white !important;
+            border-color: var(--primary);
+        }
+
+        .dark-mode ::placeholder {
+            color: #94a3b8 !important;
+            opacity: 1;
+        }
+
+        .dark-mode :-ms-input-placeholder {
+            color: #94a3b8 !important;
+        }
+
+        .dark-mode ::-ms-input-placeholder {
+            color: #94a3b8 !important;
+        }
+
+        .note-actions {
+            margin-top: 0.5rem;
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .note-actions .btn {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.8rem;
+        }
+
+        .empty-notes {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-muted);
+        }
+
+        .empty-notes-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: var(--border-color);
+        }
+
+        @media (max-width: 576px) {
+            .back-link {
+                top: 1rem;
+                right: 1rem;
+                padding: 0.6rem 1.2rem;
+                font-size: 0.9rem;
+            }
+            .theme-switcher {
+                top: 1rem;
+                left: 1rem;
+            }
+        }
+    </style>
+</head>
+<body class="{{ 'dark-mode' if theme == 'dark' else '' }}">
+    <a href="/menu" class="back-link">
+        <i class="bi bi-box-arrow-left"></i> Назад
+    </a>
+
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card notes-card mb-4">
+                    <div class="card-body text-center">
+                        <i class="bi bi-journal-text header-icon"></i>
+                        <h2>Мои заметки</h2>
+                        <div class="quote">
+                            "Записывайте идеи сразу. Если не записать, они улетучатся навсегда."<br>
+                            <small>- Леонардо да Винчи</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="card notes-card">
+                    <div class="card-body">
+                        <form method="post" action="/add_note">
+                            <div class="mb-4">
+                                <label for="note_title" class="form-label fw-bold">Заголовок заметки</label>
+                                <input type="text" name="note_title" id="note_title" class="form-control" placeholder="Введите заголовок..." required>
+                            </div>
+                            <div class="mb-4">
+                                <label for="note_content" class="form-label fw-bold">Содержание заметки</label>
+                                <textarea name="note_content" id="note_content" class="form-control" rows="6" placeholder="Напишите свою заметку здесь..." required></textarea>
+                            </div>
+                            <div class="text-end">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-save"></i> Сохранить заметку
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                {% if notes %}
+<div class="card notes-card mt-4">
+    <div class="card-body">
+        <h4 class="mb-4">Сохранённые заметки</h4>
+        <div class="notes-list">
+            {% for note in notes %}
+            <div class="note-item">
+                {% if note.editing %}
+                <form method="POST" action="/update_note/{{ note.filename }}">
+                    <div class="mb-3">
+                        <label for="note_title" class="form-label fw-bold">Заголовок заметки</label>
+                        <input type="text" name="note_title" class="form-control" value="{{ note.title }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="note_content" class="form-label fw-bold">Содержание заметки</label>
+                        <textarea name="note_content" class="form-control" rows="6" required>{{ note.content }}</textarea>
+                    </div>
+                    <div class="note-actions">
+                        <button type="submit" class="btn btn-sm btn-primary">
+                            <i class="bi bi-save"></i> Сохранить
+                        </button>
+                        <a href="/notes" class="btn btn-sm btn-secondary">
+                            <i class="bi bi-x"></i> Отмена
+                        </a>
+                    </div>
+                </form>
+                {% else %}
+                <h5>{{ note.title }}</h5>
+                <p>{{ note.content }}</p>
+                <div class="note-actions">
+                    <a href="/edit_note/{{ note.filename }}" class="btn btn-sm btn-outline-primary">
+                        <i class="bi bi-pencil"></i> Редактировать
+                    </a>
+                    <form method="POST" action="/delete_note/{{ note.filename }}" style="display:inline;">
+                        <button type="submit" class="btn btn-sm btn-outline-danger">
+                            <i class="bi bi-trash"></i> Удалить
+                        </button>
+                    </form>
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endif %}
+            </div>
+        </div>
+    </div>
+</body>
+</html>
