@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Чат общение | ПроКод</title>
+    <link rel="shortcut icon" href="/static/logo.ico">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --secondary: #4f46e5;
+            --accent: #4f46e5;
+            --dark: #1e293b;
+            --light-bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #334155;
+            --text-muted: #64748b;
+            --btn-text: #ffffff;
+            --border-color: #e2e8f0;
+            --chat-bg: #f1f5f9;
+            --user-msg-bg: #e0e7ff;
+            --other-msg-bg: #ffffff;
+            --chat-header-bg: #2563eb;
+            --chat-header-text: #ffffff;
+            --input-area-bg: #ffffff;
+        }
+
+        .dark-mode {
+            --primary: #3b82f6;
+            --secondary: #6366f1;
+            --accent: #818cf8;
+            --dark: #f8fafc;
+            --light-bg: #0f172a;
+            --card-bg: #1e293b;
+            --text-main: #e2e8f0;
+            --text-muted: #94a3b8;
+            --btn-text: #ffffff;
+            --border-color: #334155;
+            --chat-bg: #1e293b;
+            --user-msg-bg: #1e40af;
+            --other-msg-bg: #334155;
+            --chat-header-bg: #1e40af;
+            --chat-header-text: #ffffff;
+            --input-area-bg: #1e293b;
+        }
+
+        body {
+            background-color: var(--light-bg);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            color: var(--text-main);
+            padding: 2rem 0;
+        }
+
+        .back-link {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border: none;
+            border-radius: 12px;
+            color: var(--btn-text) !important;
+            text-decoration: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 6px rgba(37, 99, 235, 0.2);
+        }
+
+        .back-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(37, 99, 235, 0.3);
+            color: var(--btn-text) !important;
+        }
+
+        .back-link:active {
+            transform: translateY(0);
+        }
+
+        .back-link i {
+            margin-right: 8px;
+        }
+
+        @media (max-width: 576px) {
+            .back-link {
+                top: 1rem;
+                right: 1rem;
+                padding: 0.6rem 1.2rem;
+                font-size: 0.9rem;
+            }
+        }
+
+        .chat-card {
+            border: none;
+            border-radius: 14px;
+            box-shadow: 0 4px 20px rgba(15, 23, 42, 0.05);
+            background: var(--card-bg);
+            margin-bottom: 2rem;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            border: none;
+            padding: 0.75rem;
+            font-weight: 500;
+            border-radius: 8px;
+            transition: all 0.2s;
+            color: var(--btn-text);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--secondary);
+            transform: translateY(-1px);
+        }
+
+        .header-icon {
+            color: var(--primary);
+            margin-right: 10px;
+        }
+
+        .quote {
+            font-style: italic;
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            margin: 1.5rem 0;
+            padding: 1rem;
+            border-left: 4px solid var(--primary);
+            background-color: rgba(37, 99, 235, 0.05);
+            border-radius: 0 8px 8px 0;
+        }
+
+        .dark-mode .quote {
+            background-color: rgba(37, 99, 235, 0.15);
+        }
+
+        /* Стили для чата */
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            height: 500px;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            background-color: var(--chat-bg);
+            overflow: hidden;
+        }
+
+        .chat-header {
+            padding: 1rem;
+            background-color: var(--chat-header-bg);
+            color: var(--chat-header-text);
+            font-weight: 600;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 1rem;
+            overflow-y: auto;
+            background-color: var(--chat-bg);
+        }
+
+        .message {
+            margin-bottom: 1rem;
+            max-width: 80%;
+            padding: 0.75rem 1rem;
+            border-radius: 12px;
+            position: relative;
+            word-wrap: break-word;
+        }
+
+        .user-message {
+            background-color: var(--user-msg-bg);
+            margin-left: auto;
+            border-bottom-right-radius: 4px;
+            color: var(--text-main);
+        }
+
+        .other-message {
+            background-color: var(--other-msg-bg);
+            margin-right: auto;
+            border-bottom-left-radius: 4px;
+            color: var(--text-main);
+        }
+
+        .message-time {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 0.25rem;
+            text-align: right;
+        }
+
+        .message-user {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+            color: var(--primary);
+        }
+
+        .chat-input {
+            display: flex;
+            padding: 1rem;
+            border-top: 1px solid var(--border-color);
+            background-color: var(--input-area-bg);
+        }
+
+        .chat-input textarea {
+            flex: 1;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            padding: 0.75rem;
+            resize: none;
+            background-color: var(--input-area-bg);
+            color: var(--text-main);
+        }
+
+        .chat-input button {
+            margin-left: 0.75rem;
+            border-radius: 8px;
+        }
+
+        /* Заголовок чата */
+        .chat-title {
+            color: var(--text-main);
+        }
+
+        .dark-mode .chat-title {
+            color: #ffffff;
+        }
+    </style>
+</head>
+<body class="{{ 'dark-mode' if theme == 'dark' else '' }}">
+    <a href="/menu" class="back-link">
+        <i class="bi bi-box-arrow-left"></i> Назад
+    </a>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="card chat-card mb-4">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center mb-3">
+                            <i class="bi bi-people-fill header-icon" style="font-size: 2rem;"></i>
+                            <h2 class="mb-0 chat-title">Чат общение</h2>
+                        </div>
+                        <div class="quote">
+                            "Общение между программистами - это как обмен библиотеками между архитекторами.
+                            Каждый может построить что-то великое, используя опыт других."<br>
+                            <small>- Анонимный разработчик</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12 mb-4">
+                        <div class="card chat-card">
+                            <div class="card-body">
+                                <div class="chat-container">
+                                    <div class="chat-header">
+                                        <i class="bi bi-people-fill"></i> Общий чат
+                                    </div>
+                                    <div class="chat-messages" id="chat-messages">
+                                    {% for message in messages %}
+                                        {% if message.is_current_user %}
+                                        <div class="message user-message">
+                                            <div class="message-text">{{ message.text }}</div>
+                                            <div class="message-time">{{ message.user }}</div>
+                                        </div>
+                                        {% else %}
+                                        <div class="message other-message">
+                                            <div class="message-user">{{ message.user }}</div>
+                                            <div class="message-text">{{ message.text }}</div>
+                                        </div>
+                                        {% endif %}
+                                    {% endfor %}
+                                    </div>
+                                    <form method="POST" action="/community_chat" class="chat-input">
+                                        <textarea name="message" placeholder="Напишите сообщение..." rows="1" required></textarea>
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="bi bi-send-fill"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

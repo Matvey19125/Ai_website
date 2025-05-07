@@ -16,6 +16,7 @@ from werkzeug.utils import secure_filename
 import shutil
 import re
 
+
 def allowed_file(filename):
     return '.' in filename and \
         filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
@@ -46,6 +47,13 @@ class User(db.Model, UserMixin):
 
     def check_password(self, password):
         return check_password_hash(self.password, password)
+
+
+class ChatMessage(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    text = db.Column(db.String(500), nullable=False)
+    user = db.relationship('User', backref='messages')
 
 
 class RegistrationForm(FlaskForm):
@@ -309,12 +317,14 @@ def menu():
     theme = request.cookies.get('theme', 'light')
     return render_template("menu.html", theme=theme)
 
+
 @app.route('/set_theme', methods=['POST'])
 def set_theme():
     theme = request.form.get('theme', 'light')
     resp = make_response(redirect(url_for('menu')))
     resp.set_cookie('theme', theme, max_age=30*24*60*60)
     return resp
+
 
 @app.route('/logout')
 def logout():
@@ -361,20 +371,16 @@ def music():
 @login_required
 def video():
     theme = request.cookies.get('theme', 'light')
-
     def allowed_file(filename):
         return '.' in filename and \
             filename.rsplit('.', 1)[1].lower() in {'mp4', 'avi', 'mov', 'mkv', 'webm'}
-
     if request.method == 'POST':
         if 'videoFiles[]' not in request.files:
             flash('No file part', 'error')
             return redirect(request.url)
-
         files = request.files.getlist('videoFiles[]')
         user_folder = os.path.join(app.config['UPLOAD_FOLDER'], 'videos', str(current_user.id))
         os.makedirs(user_folder, exist_ok=True)
-
         uploaded_files = []
         for file in files:
             if file.filename == '':
@@ -389,15 +395,12 @@ def video():
                 file.save(filepath)
                 uploaded_files.append(filename)
                 flash(f'File {filename} successfully uploaded', 'success')
-
         return redirect(url_for('video'))
-
     user_folder = os.path.join(app.config['UPLOAD_FOLDER'], 'videos', str(current_user.id))
     existing_videos = []
     if os.path.exists(user_folder):
         existing_videos = sorted(os.listdir(user_folder))
         existing_videos = [{'filename': f} for f in existing_videos if allowed_file(f)]
-
     view_video = request.args.get('view')
     return render_template("video.html",
                          theme=theme,
@@ -695,6 +698,33 @@ def delete_book(filename):
 def allowed_pdf_file(filename):
     return '.' in filename and \
         filename.rsplit('.', 1)[1].lower() in {'pdf'}
+
+
+@app.route('/community_chat', methods=['GET', 'POST'])
+@login_required
+def communication():
+    theme = request.cookies.get('theme', 'light')
+    if request.method == 'POST':
+        message_text = request.form.get('message')
+        if message_text and message_text.strip():
+            new_message = ChatMessage(
+                user_id=current_user.id,
+                text=message_text.strip()
+            )
+            db.session.add(new_message)
+            db.session.commit()
+            return redirect(url_for('communication'))
+    messages = db.session.query(ChatMessage, User).join(User).order_by(ChatMessage.id).all()
+    formatted_messages = []
+    for msg, user in messages:
+        formatted_messages.append({
+            'text': msg.text,
+            'is_current_user': msg.user_id == current_user.id,
+            'user': user.email.split('@')[0]
+        })
+    return render_template("communication.html",
+                           theme=theme,
+                           messages=formatted_messages)
 
 
 if __name__ == '__main__':
