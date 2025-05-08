@@ -160,12 +160,12 @@
             border-radius: 12px;
             text-decoration: #ffffff;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            position: absolute;
+            position: fixed;
             top: 1.5rem;
             right: 1.5rem;
             box-shadow: 0 4px 6px rgba(37, 99, 235, 0.2);
             overflow: hidden;
-            z-index: 1;
+            z-index: 1000;
         }
 
         .logout-btn::before {
@@ -205,9 +205,10 @@
         }
 
         .theme-switcher {
-            position: absolute;
+            position: fixed;
             top: 1.5rem;
             left: 1.5rem;
+            z-index: 1000;
         }
 
         .theme-btn {
@@ -223,6 +224,7 @@
             border-radius: 12px;
             text-decoration: none;
             transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
         .theme-btn:hover {
@@ -246,19 +248,19 @@
     </style>
 </head>
 <body class="{{ 'dark-mode' if theme == 'dark' else '' }}">
+    <form method="post" action="/set_theme" class="theme-switcher">
+        <input type="hidden" name="theme" value="{{ 'light' if theme == 'dark' else 'dark' }}">
+        <button type="submit" class="theme-btn">
+            <i class="bi bi-{{ 'sun' if theme == 'dark' else 'moon' }}"></i>
+            <span class="ms-2">{{ 'Светлая' if theme == 'dark' else 'Тёмная' }}</span>
+        </button>
+    </form>
+
+    <a href="/logout" class="logout-btn">
+        <i class="bi bi-box-arrow-right"></i> Выйти
+    </a>
+
     <div class="container">
-        <form method="post" action="/set_theme" class="theme-switcher">
-            <input type="hidden" name="theme" value="{{ 'light' if theme == 'dark' else 'dark' }}">
-            <button type="submit" class="theme-btn">
-                <i class="bi bi-{{ 'sun' if theme == 'dark' else 'moon' }}"></i>
-                <span class="ms-2">{{ 'Светлая' if theme == 'dark' else 'Тёмная' }}</span>
-            </button>
-        </form>
-
-        <a href="/logout" class="logout-btn">
-            <i class="bi bi-box-arrow-right"></i> Выйти
-        </a>
-
         <div class="header-card text-center">
             <div class="logo-icon">
                 <svg width="30" height="30" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">

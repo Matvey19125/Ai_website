@@ -21,6 +21,12 @@
             --border-color: #e2e8f0;
             --code-bg: #f8f9fa;
             --input-bg: #ffffff;
+            --notification-success-bg: #d1fae5;
+            --notification-success-text: #065f46;
+            --notification-success-border: #10b981;
+            --notification-error-bg: #fee2e2;
+            --notification-error-text: #b91c1c;
+            --notification-error-border: #ef4444;
         }
 
         .dark-mode {
@@ -36,6 +42,12 @@
             --border-color: #334155;
             --code-bg: #1e293b;
             --input-bg: #1e293b;
+            --notification-success-bg: rgba(16, 185, 129, 0.15);
+            --notification-success-text: #6ee7b7;
+            --notification-success-border: #10b981;
+            --notification-error-bg: rgba(239, 68, 68, 0.15);
+            --notification-error-text: #fca5a5;
+            --notification-error-border: #ef4444;
         }
 
         body {
@@ -43,6 +55,7 @@
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             color: var(--text-main);
             padding: 2rem 0;
+            position: relative;
         }
 
         .back-link {
@@ -292,10 +305,78 @@
         color: var(--primary);
     }
 
-}
+    .notification {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        z-index: 1000;
+        padding: 1rem 1.5rem;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        animation: fadeIn 0.3s ease-in-out, fadeOut 0.5s ease-in-out 3s forwards;
+        max-width: 350px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .notification-success {
+        background-color: var(--notification-success-bg);
+        color: var(--notification-success-text);
+        border-left: 4px solid var(--notification-success-border);
+    }
+
+    .notification-error {
+        background-color: var(--notification-error-bg);
+        color: var(--notification-error-text);
+        border-left: 4px solid var(--notification-error-border);
+    }
+
+    .notification-close {
+        background: none;
+        border: none;
+        color: inherit;
+        cursor: pointer;
+        margin-left: 1rem;
+        font-size: 1.2rem;
+        opacity: 0.7;
+    }
+
+    .notification-close:hover {
+        opacity: 1;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeOut {
+        from { opacity: 1; transform: translateY(0); }
+        to { opacity: 0; transform: translateY(-20px); }
+    }
+
+    @media (max-width: 576px) {
+        .notification {
+            max-width: calc(100% - 40px);
+            right: 20px;
+            left: auto;
+        }
+    }
     </style>
 </head>
 <body class="{{ 'dark-mode' if theme == 'dark' else '' }}">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="notification notification-{{ category }}">
+                    {{ message }}
+                    <button class="notification-close" onclick="this.parentElement.remove()">&times;</button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
     <a href="/menu" class="back-link">
         <i class="bi bi-box-arrow-left"></i> Назад
     </a>
@@ -402,7 +483,6 @@ print(a + b){% endif %}</textarea>
 
                                 <div class="mt-4">
                                     <h5 class="mb-3"><i class="bi bi-collection"></i> Мои проекты</h5>
-
                                     {% if projects %}
                                     <div class="row">
                                         {% for project in projects %}

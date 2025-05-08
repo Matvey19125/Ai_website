@@ -339,7 +339,7 @@ def music():
     theme = request.cookies.get('theme', 'light')
     if request.method == 'POST':
         if 'musicFiles[]' not in request.files:
-            flash('No file part', 'error')
+            flash('Файл не найден', 'error')
             return redirect(request.url)
         files = request.files.getlist('musicFiles[]')
         user_folder = os.path.join(app.config['UPLOAD_FOLDER'], str(current_user.id))
@@ -347,17 +347,17 @@ def music():
         uploaded_files = []
         for file in files:
             if file.filename == '':
-                flash('No selected file', 'error')
+                flash('Файл не выбран', 'error')
                 continue
             if file and allowed_file(file.filename):
                 filename = secure_filename(file.filename)
                 filepath = os.path.join(user_folder, filename)
                 if os.path.exists(filepath):
-                    flash(f'File {filename} already exists', 'warning')
+                    flash(f'Файл {filename} уже существует', 'warning')
                     continue
                 file.save(filepath)
                 uploaded_files.append(filename)
-                flash(f'File {filename} successfully uploaded', 'success')
+                flash(f'Файл {filename} успешно загружен', 'success')
 
         return redirect(url_for('music'))
     user_folder = os.path.join(app.config['UPLOAD_FOLDER'], str(current_user.id))
@@ -384,17 +384,17 @@ def video():
         uploaded_files = []
         for file in files:
             if file.filename == '':
-                flash('No selected file', 'error')
+                flash('Нет выбранного файла', 'error')
                 continue
             if file and allowed_file(file.filename):
                 filename = secure_filename(file.filename)
                 filepath = os.path.join(user_folder, filename)
                 if os.path.exists(filepath):
-                    flash(f'File {filename} already exists', 'warning')
+                    flash(f'Файл {filename} уже существует', 'warning')
                     continue
                 file.save(filepath)
                 uploaded_files.append(filename)
-                flash(f'File {filename} successfully uploaded', 'success')
+                flash(f'Файл {filename} успешно загружен', 'success')
         return redirect(url_for('video'))
     user_folder = os.path.join(app.config['UPLOAD_FOLDER'], 'videos', str(current_user.id))
     existing_videos = []
@@ -413,22 +413,24 @@ def video():
 def add_note():
     note_title = request.form.get('note_title', '').strip()
     note_content = request.form.get('note_content', '').strip()
-    if not note_title or not note_content:
-        flash('Заголовок и содержание заметки не могут быть пустыми', 'error')
+    if not note_title:
+        flash('Заголовок заметки не может быть пустым', 'error')
         return redirect(url_for('notes'))
+    lines = [line.rstrip() for line in note_content.splitlines()]
+    while lines and not lines[-1]:
+        lines.pop()
+    cleaned_content = '\n'.join(lines)
     user_folder = os.path.join(app.config['NOTES_FOLDER'], str(current_user.id))
     os.makedirs(user_folder, exist_ok=True)
     original_title = note_title
     safe_name = safe_filename(note_title)
     if not safe_name:
         safe_name = f"note_{int(time.time())}"
-
     filename = f"{safe_name}.txt"
     filepath = os.path.join(user_folder, filename)
-
     try:
         with open(filepath, 'w', encoding='utf-8') as f:
-            f.write(note_content)
+            f.write(cleaned_content)
         title_filepath = os.path.join(user_folder, f"{safe_name}.title")
         with open(title_filepath, 'w', encoding='utf-8') as f:
             f.write(original_title)
@@ -443,19 +445,21 @@ def add_note():
 @app.route('/delete_note/<filename>', methods=['POST'])
 @login_required
 def delete_note(filename):
-    theme = request.cookies.get('theme', 'light')
     user_folder = os.path.join(app.config['NOTES_FOLDER'], str(current_user.id))
-    filepath = os.path.join(user_folder, secure_filename(filename))
-
-    if os.path.exists(filepath):
-        try:
-            os.remove(filepath)
-            flash('Заметка успешно удалена', 'success')
-        except Exception as e:
-            flash(f'Ошибка при удалении заметки: {str(e)}', 'error')
+    if filename.endswith('.txt'):
+        base_name = filename[:-4]
     else:
-        flash('Заметка не найдена', 'error')
-
+        base_name = filename
+    content_file = os.path.join(user_folder, f"{base_name}.txt")
+    title_file = os.path.join(user_folder, f"{base_name}.title")
+    try:
+        if os.path.exists(content_file):
+            os.remove(content_file)
+        if os.path.exists(title_file):
+            os.remove(title_file)
+        flash('Заметка успешно удалена', 'success')
+    except Exception as e:
+        flash(f'Ошибка при удалении заметки: {str(e)}', 'error')
     return redirect(url_for('notes'))
 
 
@@ -494,7 +498,6 @@ def get_user_notes(user_id):
 def edit_note(filename):
     user_folder = os.path.join(app.config['NOTES_FOLDER'], str(current_user.id))
     filepath = os.path.join(user_folder, secure_filename(filename))
-
     if not os.path.exists(filepath):
         flash('Заметка не найдена', 'error')
         return redirect(url_for('notes'))
@@ -510,9 +513,13 @@ def edit_note(filename):
 def update_note(filename):
     note_title = request.form.get('note_title', '').strip()
     note_content = request.form.get('note_content', '').strip()
-    if not note_title or not note_content:
-        flash('Заголовок и содержание заметки не могут быть пустыми', 'error')
+    if not note_title:
+        flash('Заголовок заметки не может быть пустым', 'error')
         return redirect(url_for('notes'))
+    lines = [line.rstrip() for line in note_content.splitlines()]
+    while lines and not lines[-1]:
+        lines.pop()
+    cleaned_content = '\n'.join(lines)
     user_folder = os.path.join(app.config['NOTES_FOLDER'], str(current_user.id))
     old_filepath = os.path.join(user_folder, secure_filename(filename))
     old_titlepath = os.path.join(user_folder, f"{filename[:-4]}.title")
@@ -522,7 +529,7 @@ def update_note(filename):
     new_titlepath = os.path.join(user_folder, f"{safe_name}.title")
     try:
         with open(old_filepath, 'w', encoding='utf-8') as f:
-            f.write(note_content)
+            f.write(cleaned_content)
         with open(old_titlepath, 'w', encoding='utf-8') as f:
             f.write(note_title)
         if old_filepath != new_filepath:
@@ -532,10 +539,10 @@ def update_note(filename):
             os.rename(old_filepath, new_filepath)
             os.rename(old_titlepath, new_titlepath)
         flash('Заметка успешно обновлена', 'success')
+        return redirect("/notes")
     except Exception as e:
         flash(f'Ошибка при обновлении заметки: {str(e)}', 'error')
     return redirect(url_for('notes'))
-
 
 def safe_filename(filename):
     filename = translit(filename, 'ru', reversed=True)
@@ -653,25 +660,25 @@ def pdf_upload():
             flash(f'Не удалось скопировать обязательный учебник: {str(e)}', 'error')
     if request.method == 'POST':
         if 'pdfFiles[]' not in request.files:
-            flash('No file part', 'error')
+            flash('Нет загруженного файла', 'error')
             return redirect(url_for('pdf_upload'))
         files = request.files.getlist('pdfFiles[]')
         uploaded_files = []
         for file in files:
             if file.filename == '':
-                flash('No selected file', 'error')
+                flash('Нет загруженного файла', 'error')
                 continue
             if file and allowed_file(file.filename):
                 filename = secure_filename(file.filename)
                 filepath = os.path.join(user_folder, filename)
                 if os.path.exists(filepath):
-                    flash(f'File {filename} already exists', 'warning')
+                    flash(f'Файл {filename} уже существует', 'warning')
                     continue
                 file.save(filepath)
                 uploaded_files.append(filename)
-                flash(f'File {filename} successfully uploaded', 'success')
+                flash(f'Файл {filename} успешно загружен', 'success')
             else:
-                flash(f'File {file.filename} is not a PDF', 'error')
+                flash(f'Файл {file.filename} не формата PDF', 'error')
         return redirect(url_for('pdf_upload'))
     existing_files = []
     if os.path.exists(user_folder):

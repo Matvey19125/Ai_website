@@ -19,6 +19,12 @@
             --text-muted: #64748b;
             --btn-text: #ffffff;
             --border-color: #e2e8f0;
+            --notification-success-bg: #d1fae5;
+            --notification-success-text: #065f46;
+            --notification-success-border: #10b981;
+            --notification-error-bg: #fee2e2;
+            --notification-error-text: #b91c1c;
+            --notification-error-border: #ef4444;
         }
 
         .dark-mode {
@@ -32,6 +38,12 @@
             --text-muted: #94a3b8;
             --btn-text: #ffffff;
             --border-color: #334155;
+            --notification-success-bg: rgba(16, 185, 129, 0.15);
+            --notification-success-text: #6ee7b7;
+            --notification-success-border: #10b981;
+            --notification-error-bg: rgba(239, 68, 68, 0.15);
+            --notification-error-text: #fca5a5;
+            --notification-error-border: #ef4444;
         }
 
         body {
@@ -166,13 +178,13 @@
         }
 
         .theme-switcher {
-        position: absolute;
-        top: 0;
-        left: 0;
-        opacity: 0;
-        width: 1px;
-        height: 1px;
-        overflow: hidden;
+            position: absolute;
+            top: 0;
+            left: 0;
+            opacity: 0;
+            width: 1px;
+            height: 1px;
+            overflow: hidden;
         }
 
         .theme-btn {
@@ -221,6 +233,62 @@
             color: var(--border-color);
         }
 
+        .note-content {
+            white-space: pre-line;
+            margin-bottom: 0;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            animation: fadeIn 0.3s ease-in-out, fadeOut 0.5s ease-in-out 3s forwards;
+            max-width: 350px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .notification-success {
+            background-color: var(--notification-success-bg);
+            color: var(--notification-success-text);
+            border-left: 4px solid var(--notification-success-border);
+        }
+
+        .notification-error {
+            background-color: var(--notification-error-bg);
+            color: var(--notification-error-text);
+            border-left: 4px solid var(--notification-error-border);
+        }
+
+        .notification-close {
+            background: none;
+            border: none;
+            color: inherit;
+            cursor: pointer;
+            margin-left: 1rem;
+            font-size: 1.2rem;
+            opacity: 0.7;
+        }
+
+        .notification-close:hover {
+            opacity: 1;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeOut {
+            from { opacity: 1; transform: translateY(0); }
+            to { opacity: 0; transform: translateY(-20px); }
+        }
+
         @media (max-width: 576px) {
             .back-link {
                 top: 1rem;
@@ -232,6 +300,11 @@
                 top: 1rem;
                 left: 1rem;
             }
+            .notification {
+                max-width: calc(100% - 40px);
+                left: 20px;
+                right: auto;
+            }
         }
     </style>
 </head>
@@ -239,6 +312,16 @@
     <a href="/menu" class="back-link">
         <i class="bi bi-box-arrow-left"></i> Назад
     </a>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages[-1:] %}
+                <div class="notification notification-{{ category }}">
+                    {{ message }}
+                    <button class="notification-close" onclick="this.parentElement.remove()">&times;</button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
 
     <div class="container">
         <div class="row justify-content-center">
@@ -274,51 +357,51 @@
                 </div>
 
                 {% if notes %}
-<div class="card notes-card mt-4">
-    <div class="card-body">
-        <h4 class="mb-4">Сохранённые заметки</h4>
-        <div class="notes-list">
-            {% for note in notes %}
-            <div class="note-item">
-                {% if note.editing %}
-                <form method="POST" action="/update_note/{{ note.filename }}">
-                    <div class="mb-3">
-                        <label for="note_title" class="form-label fw-bold">Заголовок заметки</label>
-                        <input type="text" name="note_title" class="form-control" value="{{ note.title }}" required>
+                <div class="card notes-card mt-4">
+                    <div class="card-body">
+                        <h4 class="mb-4">Сохранённые заметки</h4>
+                        <div class="notes-list">
+                            {% for note in notes %}
+                            <div class="note-item">
+                                {% if note.editing %}
+                                <form method="POST" action="/update_note/{{ note.filename }}">
+                                    <div class="mb-3">
+                                        <label for="note_title" class="form-label fw-bold">Заголовок заметки</label>
+                                        <input type="text" name="note_title" class="form-control" value="{{ note.title }}" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="note_content" class="form-label fw-bold">Содержание заметки</label>
+                                        <textarea name="note_content" class="form-control" rows="6" required>{{ note.content }}</textarea>
+                                    </div>
+                                    <div class="note-actions">
+                                        <button type="submit" class="btn btn-sm btn-primary">
+                                            <i class="bi bi-save"></i> Сохранить
+                                        </button>
+                                        <a href="/notes" class="btn btn-sm btn-secondary">
+                                            <i class="bi bi-x"></i> Отмена
+                                        </a>
+                                    </div>
+                                </form>
+                                {% else %}
+                                <h5>{{ note.title }}</h5>
+                                <p class="note-content">{{ note.content }}</p>
+                                <div class="note-actions">
+                                    <a href="/edit_note/{{ note.filename }}" class="btn btn-sm btn-outline-primary">
+                                        <i class="bi bi-pencil"></i> Редактировать
+                                    </a>
+                                    <form method="POST" action="/delete_note/{{ note.filename }}" style="display:inline;">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">
+                                            <i class="bi bi-trash"></i> Удалить
+                                        </button>
+                                    </form>
+                                </div>
+                                {% endif %}
+                            </div>
+                            {% endfor %}
+                        </div>
                     </div>
-                    <div class="mb-3">
-                        <label for="note_content" class="form-label fw-bold">Содержание заметки</label>
-                        <textarea name="note_content" class="form-control" rows="6" required>{{ note.content }}</textarea>
-                    </div>
-                    <div class="note-actions">
-                        <button type="submit" class="btn btn-sm btn-primary">
-                            <i class="bi bi-save"></i> Сохранить
-                        </button>
-                        <a href="/notes" class="btn btn-sm btn-secondary">
-                            <i class="bi bi-x"></i> Отмена
-                        </a>
-                    </div>
-                </form>
-                {% else %}
-                <h5>{{ note.title }}</h5>
-                <p>{{ note.content }}</p>
-                <div class="note-actions">
-                    <a href="/edit_note/{{ note.filename }}" class="btn btn-sm btn-outline-primary">
-                        <i class="bi bi-pencil"></i> Редактировать
-                    </a>
-                    <form method="POST" action="/delete_note/{{ note.filename }}" style="display:inline;">
-                        <button type="submit" class="btn btn-sm btn-outline-danger">
-                            <i class="bi bi-trash"></i> Удалить
-                        </button>
-                    </form>
                 </div>
                 {% endif %}
-            </div>
-            {% endfor %}
-        </div>
-    </div>
-</div>
-{% endif %}
             </div>
         </div>
     </div>

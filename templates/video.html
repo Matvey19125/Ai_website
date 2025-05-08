@@ -19,6 +19,12 @@
             --text-muted: #64748b;
             --btn-text: #ffffff;
             --border-color: #e2e8f0;
+            --notification-success-bg: #d1fae5;
+            --notification-success-text: #065f46;
+            --notification-success-border: #10b981;
+            --notification-error-bg: #fee2e2;
+            --notification-error-text: #b91c1c;
+            --notification-error-border: #ef4444;
         }
 
         .dark-mode {
@@ -32,6 +38,12 @@
             --text-muted: #94a3b8;
             --btn-text: #ffffff;
             --border-color: #334155;
+            --notification-success-bg: rgba(16, 185, 129, 0.15);
+            --notification-success-text: #6ee7b7;
+            --notification-success-border: #10b981;
+            --notification-error-bg: rgba(239, 68, 68, 0.15);
+            --notification-error-text: #fca5a5;
+            --notification-error-border: #ef4444;
         }
 
         body {
@@ -388,6 +400,57 @@
             color: var(--text-muted) !important;
         }
 
+        .notification {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            animation: fadeIn 0.3s ease-in-out, fadeOut 0.5s ease-in-out 3s forwards;
+            max-width: 350px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .notification-success {
+            background-color: var(--notification-success-bg);
+            color: var(--notification-success-text);
+            border-left: 4px solid var(--notification-success-border);
+        }
+
+        .notification-error {
+            background-color: var(--notification-error-bg);
+            color: var(--notification-error-text);
+            border-left: 4px solid var(--notification-error-border);
+        }
+
+        .notification-close {
+            background: none;
+            border: none;
+            color: inherit;
+            cursor: pointer;
+            margin-left: 1rem;
+            font-size: 1.2rem;
+            opacity: 0.7;
+        }
+
+        .notification-close:hover {
+            opacity: 1;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeOut {
+            from { opacity: 1; transform: translateY(0); }
+            to { opacity: 0; transform: translateY(-20px); }
+        }
+
         @media (max-width: 576px) {
             .back-link {
                 top: 1rem;
@@ -403,6 +466,12 @@
             .video-player {
                 height: 300px;
             }
+
+            .notification {
+                max-width: calc(100% - 40px);
+                left: 20px;
+                right: auto;
+            }
         }
     </style>
 </head>
@@ -410,6 +479,17 @@
     <a href="/menu" class="back-link">
         <i class="bi bi-box-arrow-left"></i> Назад
     </a>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages[-1:] %}
+                <div class="notification notification-{{ category }}">
+                    {{ message }}
+                    <button class="notification-close" onclick="this.parentElement.remove()">&times;</button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
 
     <div class="container videos-container">
         <div class="header-section">
