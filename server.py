@@ -776,4 +776,4 @@ if __name__ == '__main__':
         db.create_all()
         notes_folder = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static', 'notes')
         os.makedirs(notes_folder, exist_ok=True)
-    app.run(port=8080, host='127.0.0.1')
+    app.run()
