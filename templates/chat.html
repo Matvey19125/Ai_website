@@ -19,6 +19,12 @@
             --text-muted: #64748b;
             --btn-text: #ffffff;
             --border-color: #e2e8f0;
+            --notification-success-bg: #d1fae5;
+            --notification-success-text: #065f46;
+            --notification-success-border: #10b981;
+            --notification-error-bg: #fee2e2;
+            --notification-error-text: #b91c1c;
+            --notification-error-border: #ef4444;
         }
 
         .dark-mode {
@@ -28,10 +34,16 @@
             --dark: #f8fafc;
             --light-bg: #0f172a;
             --card-bg: #1e293b;
-            --text-main: #ffffff;
+            --text-main: #e2e8f0;
             --text-muted: #94a3b8;
             --btn-text: #ffffff;
             --border-color: #334155;
+            --notification-success-bg: rgba(16, 185, 129, 0.15);
+            --notification-success-text: #6ee7b7;
+            --notification-success-border: #10b981;
+            --notification-error-bg: rgba(239, 68, 68, 0.15);
+            --notification-error-text: #fca5a5;
+            --notification-error-border: #ef4444;
         }
 
         body {
@@ -40,18 +52,151 @@
             color: var(--text-main);
             padding: 2rem 0;
             position: relative;
+            transition: background-color 0.3s ease;
         }
 
         h1, h2, h3, h4, h5, h6,
         p, span, div,
-        .form-control, .form-label,
+        .form-control, .form-select, .form-label,
         .ai-response, .quote-box,
         .btn:not(.btn-primary):not(.back-link) {
+            color: var(--text-main) !important;
+            transition: color 0.3s ease;
+        }
+
+        .form-label, label.form-label, .form-label.fw-bold {
             color: var(--text-main) !important;
         }
 
         .btn-primary, .back-link {
             color: var(--btn-text) !important;
+        }
+
+        label.form-label {
+            color: var(--text-main);
+        }
+
+        .form-label.fw-bold {
+            color: var(--text-main) !important;
+        }
+
+        .chat-card {
+            border: none;
+            border-radius: 14px;
+            box-shadow: 0 4px 20px rgba(15, 23, 42, 0.05);
+            background: var(--card-bg);
+            overflow: hidden;
+            margin-bottom: 1.5rem;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .dark-mode .chat-card {
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border: none;
+            padding: 0.75rem;
+            font-weight: 500;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(37, 99, 235, 0.2);
+        }
+
+        .form-control {
+            background-color: var(--card-bg);
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            transition: all 0.3s ease;
+        }
+
+        /* Placeholder styles for light mode */
+        .form-control::placeholder {
+            color: var(--text-muted);
+            opacity: 1;
+        }
+        .form-control::-webkit-input-placeholder {
+            color: var(--text-muted);
+        }
+        .form-control:-ms-input-placeholder {
+            color: var(--text-muted);
+        }
+        .form-control::-ms-input-placeholder {
+            color: var(--text-muted);
+        }
+
+        .dark-mode .form-control::placeholder {
+            color: var(--text-muted) !important;
+        }
+        .dark-mode .form-control::-webkit-input-placeholder {
+            color: var(--text-muted) !important;
+        }
+        .dark-mode .form-control:-ms-input-placeholder {
+            color: var(--text-muted) !important;
+        }
+        .dark-mode .form-control::-ms-input-placeholder {
+            color: var(--text-muted) !important;
+        }
+
+        .form-control:focus {
+            background-color: var(--card-bg);
+            color: var(--text-main);
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .dark-mode .form-control:focus {
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
+        }
+
+        .header-icon {
+            color: var(--primary);
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            transition: color 0.3s ease;
+        }
+
+        .ai-response {
+            background-color: rgba(37, 99, 235, 0.05);
+            border-radius: 10px;
+            padding: 1rem;
+            margin-top: 1rem;
+            border-left: 4px solid var(--primary);
+            transition: all 0.3s ease;
+        }
+
+        .dark-mode .ai-response {
+            background-color: rgba(37, 99, 235, 0.15);
+        }
+
+        .user-message {
+            font-weight: 500;
+            color: var(--primary);
+            transition: color 0.3s ease;
+        }
+
+        .quote-box {
+            font-style: italic;
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            margin: 1.5rem 0;
+            padding: 1rem;
+            border-left: 4px solid var(--primary);
+            background-color: rgba(37, 99, 235, 0.05);
+            border-radius: 0 8px 8px 0;
+            max-width: 600px;
+            transition: all 0.3s ease;
+        }
+
+        .dark-mode .quote-box {
+            background-color: rgba(37, 99, 235, 0.15);
         }
 
         .back-link {
@@ -85,133 +230,94 @@
             margin-right: 8px;
         }
 
-        .chat-card {
-            border: none;
-            border-radius: 14px;
-            box-shadow: 0 4px 20px rgba(15, 23, 42, 0.05);
-            background: var(--card-bg);
-            overflow: hidden;
-            margin-bottom: 1.5rem;
-        }
-
-        .dark-mode .chat-card {
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            border: none;
-            padding: 0.75rem;
-            font-weight: 500;
-            border-radius: 8px;
-            transition: all 0.2s;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 8px rgba(37, 99, 235, 0.2);
-        }
-
-        .form-control {
-            background-color: var(--card-bg);
-            color: var(--text-main);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 0.75rem 1rem;
-            transition: border-color 0.2s;
-        }
-
-        .form-control:focus {
-            background-color: var(--card-bg);
-            color: var(--text-main);
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-        }
-
-        .dark-mode .form-control:focus {
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
-        }
-
-        .logo-icon {
-            width: 48px;
-            height: 48px;
-            margin: 0 auto 1rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
-            border-radius: 12px;
-            color: var(--primary);
-        }
-
-        .dark-mode .logo-icon {
-            background: linear-gradient(135deg, #1e3a8a, #1e40af);
-        }
-
-        h3 {
-            font-weight: 600;
-            font-size: 1.5rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .ai-response {
-            background-color: rgba(37, 99, 235, 0.05);
-            border-radius: 10px;
-            padding: 1rem;
-            margin-top: 1rem;
-            border-left: 4px solid var(--primary);
-        }
-
-        .dark-mode .ai-response {
-            background-color: rgba(37, 99, 235, 0.15);
-        }
-
-        .user-message {
-            font-weight: 500;
-            color: var(--primary);
-        }
-
-        .quote-box {
-            font-style: italic;
-            color: var(--text-muted);
-            font-size: 1rem;
-            margin: 1rem auto 1.5rem;
-            padding: 1rem;
-            border-left: 4px solid var(--primary);
-            background-color: rgba(37, 99, 235, 0.05);
-            border-radius: 0 8px 8px 0;
-            max-width: 600px;
-        }
-
-        .dark-mode .quote-box {
-            background-color: rgba(37, 99, 235, 0.15);
-        }
-
-        .dark-mode ::placeholder {
-            color: var(--text-muted) !important;
-            opacity: 1;
-        }
-
-        .dark-mode :-ms-input-placeholder {
-            color: var(--text-muted) !important;
-        }
-
-        .dark-mode ::-ms-input-placeholder {
-            color: var(--text-muted) !important;
-        }
-
         .assistant-text {
             color: var(--text-muted);
             font-size: 1rem;
             margin-bottom: 0;
+            transition: color 0.3s ease;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            animation: fadeIn 0.3s ease-in-out, fadeOut 0.5s ease-in-out 3s forwards;
+            max-width: 350px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .notification-success {
+            background-color: var(--notification-success-bg);
+            color: var(--notification-success-text);
+            border-left: 4px solid var(--notification-success-border);
+        }
+
+        .notification-error {
+            background-color: var(--notification-error-bg);
+            color: var(--notification-error-text);
+            border-left: 4px solid var(--notification-error-border);
+        }
+
+        .notification-close {
+            background: none;
+            border: none;
+            color: inherit;
+            cursor: pointer;
+            margin-left: 1rem;
+            font-size: 1.2rem;
+            opacity: 0.7;
+        }
+
+        .notification-close:hover {
+            opacity: 1;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeOut {
+            from { opacity: 1; transform: translateY(0); }
+            to { opacity: 0; transform: translateY(-20px); }
         }
 
         @media (max-width: 576px) {
+            body {
+                padding: 1.5rem 0;
+            }
+
             .back-link {
                 top: 1rem;
                 right: 1rem;
                 padding: 0.6rem 1.2rem;
                 font-size: 0.9rem;
+            }
+
+            .notification {
+                max-width: calc(100% - 40px);
+                left: 20px;
+                right: auto;
+            }
+
+            .form-label, .form-label.fw-bold {
+                color: var(--text-main) !important;
+            }
+
+            .header-icon {
+                font-size: 2rem;
+            }
+
+            .quote-box {
+                font-size: 1rem;
+                margin: 1rem 0;
+                padding: 0.75rem;
             }
         }
     </style>
@@ -221,33 +327,44 @@
         <i class="bi bi-box-arrow-left"></i> Назад
     </a>
 
-    <div class="container py-5">
-        <div class="row justify-content-center mb-4">
-            <div class="col-md-8 text-center">
-                <div class="logo-icon mx-auto">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>
-                    </svg>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages[-1:] %}
+                <div class="notification notification-{{ category }}">
+                    {{ message }}
+                    <button class="notification-close" onclick="this.parentElement.remove()">&times;</button>
                 </div>
-                <h3>Чат с ИИ</h3>
-                <p class="assistant-text">Ваш помощник в обучении программированию</p>
-                <div class="quote-box">
-                    "Искусственный интеллект - это зеркало, отражающее человеческий разум. То, что мы видим в нём, говорит больше о нас самих, чем о самой технологии."<br>
-                    <small>- Макс Тегмарк, физик и автор книги "Жизнь 3.0"</small>
-                </div>
-            </div>
-        </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
 
+    <div class="container">
         <div class="row justify-content-center">
-            <div class="col-md-8">
+            <div class="col-lg-8">
+                <div class="card chat-card mb-4">
+                    <div class="card-body text-center">
+                        <i class="bi bi-robot header-icon"></i>
+                        <h2>Чат с ИИ</h2>
+                        <p class="assistant-text">Ваш помощник в обучении программированию</p>
+                        <div class="quote-box mx-auto">
+                            "Искусственный интеллект - это зеркало, отражающее человеческий разум. То, что мы видим в нём, говорит больше о нас самих, чем о самой технологии."<br>
+                            <small>- Макс Тегмарк, физик и автор книги "Жизнь 3.0"</small>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="card chat-card">
                     <div class="card-body">
                         <form method="POST" action="/chat">
-                            <div class="mb-3">
-                                <label for="user_input" class="form-label">Ваш запрос:</label>
+                            <div class="mb-4">
+                                <label for="user_input" class="form-label fw-bold">Ваш запрос:</label>
                                 <textarea class="form-control" id="user_input" name="user_input" rows="4" required placeholder="Введите ваш вопрос...">{{ user_input or '' }}</textarea>
                             </div>
-                            <button type="submit" class="btn btn-primary w-100">Отправить</button>
+                            <div class="text-end">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-send"></i> Отправить
+                                </button>
+                            </div>
                         </form>
                     </div>
                 </div>
@@ -255,10 +372,11 @@
                 {% if error %}
                     <div class="alert alert-danger">{{ error }}</div>
                 {% endif %}
+
                 {% if response %}
-                    <div class="card chat-card">
+                    <div class="card chat-card mt-4">
                         <div class="card-body">
-                            <h5 class="card-title">Ответ ИИ</h5>
+                            <h4 class="mb-4">Ответ ИИ</h4>
                             {% if user_input %}
                                 <p class="user-message mb-3">Вы: {{ user_input }}</p>
                             {% endif %}

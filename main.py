@@ -6,15 +6,14 @@ from wtforms.validators import DataRequired, Email, Length
 from wtforms import StringField, PasswordField, SubmitField
 from wtforms.validators import DataRequired, Email
 from werkzeug.security import generate_password_hash, check_password_hash
-import g4f
 import subprocess
-import sys
 import time
 import os
 from deep_translator import GoogleTranslator
 from werkzeug.utils import secure_filename
 import shutil
 import re
+import requests
 
 
 def allowed_file(filename):
@@ -113,17 +112,46 @@ def output():
 def chat_page():
     theme = request.cookies.get('theme', 'light')
     if request.method == 'POST':
-        user_input = request.form.get('user_input')
-        if user_input:
-            try:
-                response = g4f.ChatCompletion.create(
-                    model="gpt-4",
-                    messages=[{"role": "user", "content": user_input}]
-                )
-                return render_template('chat.html', theme=theme, response=response, user_input=user_input)
-            except Exception as e:
-                return render_template('chat.html', theme=theme, error=str(e))
+        user_input = request.form.get('user_input', '').strip()
+        if not user_input:
+            return render_template('chat.html', theme=theme)
+
+        try:
+            url = "https://api.intelligence.io.solutions/api/v1/chat/completions"
+            headers = {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer io-v2-eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJvd25lciI6ImZlM2E0YWFjLTBiYjYtNDFjZS1iYWUxLTQ3N2E3YjMxZmQ5YSIsImV4cCI6NDkwMDMyMTc2MH0.l9ew95w7cVNbFTN2HNb9q8_3H1JrUKUtJ7vZ3C20Y-iDYJZ56Hbka4JCegWVu5MVDd_C8n1IFWpssB7WHDBnfA"
+            }
+            data = {
+                "model": "mistralai/Mistral-Large-Instruct-2411",
+                "messages": [
+                    {
+                        "role": "system",
+                        "content": "You are a helpful assistant."
+                    },
+                    {
+                        "role": "user",
+                        "content": user_input
+                    }
+                ]
+            }
+            response = requests.post(url, headers=headers, json=data)
+            if response.status_code != 200:
+                return render_template('chat.html',
+                                       theme=theme,
+                                       error=f"API Error: {response.status_code} - {response.text}")
+            response_data = response.json()
+            assistant_reply = response_data.get('choices', [{}])[0].get('message', {}).get('content', '')
+            return render_template('chat.html',
+                                   theme=theme,
+                                   response=assistant_reply,
+                                   user_input=user_input)
+        except Exception as e:
+            return render_template('chat.html',
+                                   theme=theme,
+                                   error=f"Ошибка: {str(e)}")
     return render_template('chat.html', theme=theme)
+
 
 
 @app.route('/create_project', methods=['POST'])
@@ -626,16 +654,25 @@ def delete_track():
     if not filename:
         flash('Не указано имя файла для удаления', 'error')
         return redirect(url_for('music'))
-
     user_folder = os.path.join(app.config['UPLOAD_FOLDER'], str(current_user.id))
     filepath = os.path.join(user_folder, filename)
-
-    if os.path.exists(filepath):
-        os.remove(filepath)
-        flash(f'Файл {filename} успешно удален', 'success')
-    else:
-        flash(f'Файл {filename} не найден', 'error')
-
+    try:
+        if os.path.exists(filepath):
+            temp_path = filepath + '.temp'
+            try:
+                os.rename(filepath, temp_path)
+            except PermissionError:
+                flash(f'Файл {filename} используется и не может быть удалён', 'error')
+                return redirect(url_for('music'))
+            try:
+                os.remove(temp_path)
+                flash(f'Файл {filename} успешно удалён', 'success')
+            except Exception as e:
+                flash(f'Ошибка при удалении файла: {str(e)}', 'error')
+        else:
+            flash(f'Файл {filename} не найден', 'error')
+    except Exception as e:
+        flash(f'Произошла ошибка: {str(e)}', 'error')
     return redirect(url_for('music'))
 
 
