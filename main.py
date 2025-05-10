@@ -168,7 +168,7 @@ def create_project():
         flash('Проект с таким именем уже существует', 'error')
         return redirect(url_for('run_code'))
     os.makedirs(project_folder)
-    save_code_to_file(os.path.join(project_folder, 'server.py'), '''# Ваш код Python
+    save_code_to_file(os.path.join(project_folder, 'main.py'), '''# Ваш код Python
 print("Привет, мир!")''')
     flash(f'Проект "{project_name}" успешно создан', 'success')
     return redirect(url_for('run_code'))
@@ -195,7 +195,7 @@ def save_project(project_name):
         return redirect(url_for('run_code'))
 
     try:
-        save_code_to_file(os.path.join(project_folder, 'server.py'), code)
+        save_code_to_file(os.path.join(project_folder, 'main.py'), code)
         flash('Проект успешно сохранен', 'success')
     except Exception as e:
         flash(f'Ошибка при сохранении проекта: {str(e)}', 'error')
@@ -211,7 +211,7 @@ def load_project(project_name):
     if not os.path.exists(project_folder):
         flash('Проект не найден', 'error')
         return redirect(url_for('run_code'))
-    main_file = os.path.join(project_folder, 'server.py')
+    main_file = os.path.join(project_folder, 'main.py')
     if os.path.exists(main_file):
         with open(main_file, 'r', encoding='utf-8') as f:
             lines = f.readlines()
@@ -252,7 +252,7 @@ def run_code():
 
             if os.path.exists(project_folder):
                 try:
-                    save_code_to_file(os.path.join(project_folder, 'server.py'), code)
+                    save_code_to_file(os.path.join(project_folder, 'main.py'), code)
                 except Exception as e:
                     flash(f'Ошибка при сохранении проекта: {str(e)}', 'error')
         try:
@@ -776,4 +776,4 @@ if __name__ == '__main__':
         db.create_all()
         notes_folder = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static', 'notes')
         os.makedirs(notes_folder, exist_ok=True)
-    app.run()
+    app.run(port=8080, host='127.0.0.1')
