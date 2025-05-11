@@ -22,11 +22,12 @@ def allowed_file(filename):
 
 
 app = Flask(__name__)
+basedir = os.path.abspath(os.path.dirname(__file__))
 app.config['NOTES_FOLDER'] = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static', 'notes')
 app.config['PROJECTS_FOLDER'] = 'static/projects'
 app.config['UPLOAD_FOLDER'] = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static', 'uploads')
 app.config['SECRET_KEY'] = 'negt7821-Igoryan'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///password.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{os.path.join(basedir, "instance", "password.db")}'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['UPLOAD_FOLDER'] = 'static/uploads'
 app.config['MAX_CONTENT_LENGTH'] = 1000000 * 1024 * 1024
@@ -88,7 +89,7 @@ def main_reg():
         db.session.commit()
         login_user(new_user)
         return redirect(url_for('menu'))
-    return render_template('register.html', form=form)
+    return render_template('index.html', form=form)
 
 
 @app.route("/output", methods=['GET', 'POST'])
