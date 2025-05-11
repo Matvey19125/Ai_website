@@ -13,7 +13,7 @@ from deep_translator import GoogleTranslator
 from werkzeug.utils import secure_filename
 import shutil
 import re
-import g4f
+import requests
 
 
 def allowed_file(filename):
@@ -108,21 +108,11 @@ def output():
     return render_template("login.html", form=form)
 
 
-@app.route("/chat", methods=['GET', 'POST'])
+@app.route("/relax", methods=['GET', 'POST'])
 @login_required
-def chat_page():
-    if request.method == 'POST':
-        user_input = request.form.get('user_input')
-        if user_input:
-            try:
-                response = g4f.ChatCompletion.create(
-                    model="gpt-4",
-                    messages=[{"role": "user", "content": user_input}]
-                )
-                return render_template('chat.html', response=response, user_input=user_input)
-            except Exception as e:
-                return render_template('chat.html', error=str(e))
-    return render_template('chat.html')
+def relax_page():
+    theme = request.cookies.get('theme', 'light')
+    return render_template('relax.html', theme=theme)
 
 
 

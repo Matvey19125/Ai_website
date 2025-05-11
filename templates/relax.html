@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Релакс/Отдых | ПроКод</title>
+    <link rel="shortcut icon" href="/static/logo.ico">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            overflow: hidden;
+            background-color: #000;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .back-link {
+            position: fixed;
+            top: 1.5rem;
+            right: 1.5rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            color: white;
+            background: linear-gradient(135deg, #2563eb, #4f46e5);
+            border: none;
+            border-radius: 12px;
+            text-decoration: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 6px rgba(37, 99, 235, 0.2);
+            z-index: 1000;
+        }
+
+        .back-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(37, 99, 235, 0.3);
+        }
+
+        .back-link i {
+            margin-right: 8px;
+        }
+
+        .quote-container {
+            max-width: 90%;
+            width: 800px;
+            padding: 2rem;
+            position: relative;
+            z-index: 1;
+            height: auto;
+            min-height: 200px;
+        }
+
+        .quote {
+            font-style: italic;
+            font-size: 2rem;
+            line-height: 1.4;
+            margin: 0 auto 1rem;
+            opacity: 0;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100%;
+            padding: 1.5rem;
+            text-align: center;
+            animation: fadeInOut 60s infinite;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.8);
+            box-sizing: border-box;
+        }
+
+        .quote:nth-child(1) { animation-delay: 0s; }
+        .quote:nth-child(2) { animation-delay: 15s; }
+        .quote:nth-child(3) { animation-delay: 30s; }
+        .quote:nth-child(4) { animation-delay: 45s; }
+
+        .quote-author {
+            font-size: 1.5rem;
+            color: rgba(255, 255, 255, 0.8);
+            display: block;
+            margin-top: 1.5rem;
+            font-style: normal;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+        }
+
+        .video-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: -1;
+            opacity: 0.7;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            z-index: 0;
+        }
+
+        .hidden-audio {
+            position: absolute;
+            opacity: 0;
+            width: 1px;
+            height: 1px;
+            pointer-events: none;
+        }
+
+        .volume-control-container {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background-color: rgba(0, 0, 0, 0.5);
+            padding: 10px 15px;
+            border-radius: 30px;
+            backdrop-filter: blur(5px);
+        }
+
+        .volume-icon {
+            color: white;
+            font-size: 1.2rem;
+        }
+
+        .volume-slider {
+            width: 100px;
+            height: 5px;
+            -webkit-appearance: none;
+            appearance: none;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 5px;
+            outline: none;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+
+        .volume-slider:hover {
+            opacity: 1;
+        }
+
+        .volume-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            background: white;
+            cursor: pointer;
+        }
+
+        .volume-slider::-moz-range-thumb {
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            background: white;
+            cursor: pointer;
+        }
+
+        @keyframes fadeInOut {
+            0% { opacity: 0; }
+            10% { opacity: 1; }
+            25% { opacity: 1; }
+            35% { opacity: 0; }
+            100% { opacity: 0; }
+        }
+
+        @media (max-width: 768px) {
+            .quote {
+                font-size: 1.8rem;
+                padding: 1rem;
+            }
+            .quote-author {
+                font-size: 1.3rem;
+            }
+            .volume-control-container {
+                bottom: 1.5rem;
+                right: 1.5rem;
+                padding: 8px 12px;
+            }
+            .volume-slider {
+                width: 80px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .back-link {
+                top: 1rem;
+                right: 1rem;
+                padding: 0.6rem 1.2rem;
+                font-size: 0.9rem;
+            }
+            .quote {
+                font-size: 1.4rem;
+                padding: 1rem 0.5rem;
+            }
+            .quote-author {
+                font-size: 1.1rem;
+                margin-top: 1rem;
+            }
+            .volume-control-container {
+                bottom: 1rem;
+                right: 1rem;
+                padding: 6px 10px;
+            }
+            .volume-slider {
+                width: 60px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <video autoplay muted loop class="video-background">
+        <source src="/static/relax.mp4" type="video/mp4">
+        Ваш браузер не поддерживает видео.
+    </video>
+    <div class="overlay"></div>
+    <audio id="background-audio" class="hidden-audio" autoplay loop>
+        <source src="/static/relax.mp3" type="audio/mp3">
+        Ваш браузер не поддерживает аудио.
+    </audio>
+
+    <a href="/menu" class="back-link">
+        <i class="bi bi-box-arrow-left"></i> Назад
+    </a>
+
+    <div class="quote-container">
+        <div class="quote">
+            "Отдых - это не безделье. Иногда самый продуктивный день - это лежать на траве и смотреть в небо."
+            <span class="quote-author">— Джон Леннон</span>
+        </div>
+
+        <div class="quote">
+            "Тишина - это отдых для ума, а отдых дает новые силы."
+            <span class="quote-author">— Дейл Карнеги</span>
+        </div>
+        <div class="quote">
+            "Иногда самое важное - это просто сделать шаг назад и вдохнуть."
+            <span class="quote-author">— Неизвестный автор</span>
+        </div>
+        <div class="quote">
+            "Мы не можем думать о работе 24/7. Нашему мозгу нужен отдых, чтобы создавать лучшие идеи."
+            <span class="quote-author">— Аристотель</span>
+        </div>
+    </div>
+    <div class="volume-control-container">
+        <i class="bi bi-volume-up volume-icon"></i>
+        <input type="range" min="0" max="1" step="0.01" value="0.7" class="volume-slider"
+               oninput="document.getElementById('background-audio').volume = this.value">
+    </div>
+</body>
+</html>
